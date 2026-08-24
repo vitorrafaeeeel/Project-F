@@ -45,12 +45,18 @@ export function useAuthActions(user) {
         await signInWithEmailAndPassword(auth, email.trim(), password);
       }
     } catch (error) {
-      console.error('Auth form error:', error);
+      if (import.meta.env.DEV) {
+        console.error('[Auth Service Error]:', {
+          code: error.code,
+          message: error.message
+        });
+      }
       setAuthError(getAuthErrorMessage(error.code));
     } finally {
       setAuthLoading(false);
     }
   }, []);
+
 
   const handlePasswordReset = useCallback(async (email) => {
     setAuthError('');
