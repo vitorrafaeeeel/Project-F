@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { parseCurrencyInput } from '../../../shared/lib/currency.js';
 
 export function useAccountSettingsForm(data, updateData) {
   const [editIncome, setEditIncome] = useState('');
@@ -14,15 +15,16 @@ export function useAccountSettingsForm(data, updateData) {
     setEditBudget((data.plannedBudget || 0).toString());
   }
 
-  const handleUpdateAccount = (closeModal) => {
-    const newIncome = parseFloat(editIncome.replace(',', '.'));
-    const newBalance = parseFloat(editBalance.replace(',', '.'));
-    const newBudget = parseFloat(editBudget.replace(',', '.'));
+  const handleUpdateAccount = useCallback((closeModal) => {
+    const newIncome = parseCurrencyInput(editIncome);
+    const newBalance = parseCurrencyInput(editBalance);
+    const newBudget = parseCurrencyInput(editBudget);
     if (!isNaN(newIncome) && newIncome >= 0 && !isNaN(newBalance) && !isNaN(newBudget)) {
-      updateData({ income: newIncome, currentAccountBalance: newBalance, plannedBudget: newBudget });
+      updateData?.({ income: newIncome, currentAccountBalance: newBalance, plannedBudget: newBudget });
       closeModal?.();
     }
-  };
+  }, [editIncome, editBalance, editBudget, updateData]);
 
   return { editIncome, setEditIncome, editBalance, setEditBalance, editBudget, setEditBudget, handleUpdateAccount };
 }
+

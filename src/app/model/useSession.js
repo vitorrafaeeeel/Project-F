@@ -7,16 +7,11 @@ import { firebaseApiKey } from '../../shared/config/env.js';
 // Se as variáveis de ambiente não estiverem configuradas, nunca chega a assinar o listener.
 export function useSession() {
   const [user, setUser] = useState(null);
-  const [authReady, setAuthReady] = useState(false);
-  const [envError] = useState(
-    firebaseApiKey ? '' : 'Configure VITE_FIREBASE_API_KEY ou VITE_GOOGLE_API_KEY no arquivo .env.local e reinicie o servidor.'
-  );
+  const envError = firebaseApiKey ? '' : 'Configure VITE_FIREBASE_API_KEY ou VITE_GOOGLE_API_KEY no arquivo .env.local e reinicie o servidor.';
+  const [authReady, setAuthReady] = useState(!firebaseApiKey);
 
   useEffect(() => {
-    if (envError) {
-      setAuthReady(true);
-      return undefined;
-    }
+    if (envError) return undefined;
 
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -27,3 +22,4 @@ export function useSession() {
 
   return { user, authReady, envError };
 }
+

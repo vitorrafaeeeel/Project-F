@@ -5,7 +5,7 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseApiKey } from '../../config/env.js';
 
 const firebaseConfig = {
-  apiKey: firebaseApiKey,
+  apiKey: firebaseApiKey || import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCnwLv4djcrm-qgA0Hw7cJtSpy6aU5TCAE',
   authDomain: 'project-f-77ed8.firebaseapp.com',
   projectId: 'project-f-77ed8',
   storageBucket: 'project-f-77ed8.firebasestorage.app',
@@ -13,6 +13,7 @@ const firebaseConfig = {
   appId: '1:261138589545:web:e6eb19add3bfe6eb8c7ff8',
   measurementId: 'G-ETLN1M012M'
 };
+
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

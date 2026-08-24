@@ -1,14 +1,48 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import {
   DollarSign, ArrowDownCircle, Wallet, Sparkles, Bot, BarChart3, TrendingUp, ArrowDownRight, ArrowUpRight
 } from 'lucide-react';
 import { formatCurrency } from '../../../shared/lib/currency.js';
 
 export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoading, handleGenerateInsight }) => {
-  if (!projections.currentMonthStats) return null;
-  const maxChartValue = projections.timeline.length > 0
-    ? Math.max(...projections.timeline.map(t => Math.max(t.netBalance, t.totalInvestments, 0)))
-    : 100;
+  const maxChartValue = useMemo(() => {
+    if (!projections?.timeline || projections.timeline.length === 0) return 100;
+    const maxVal = Math.max(...projections.timeline.map(t => Math.max(t.netBalance || 0, t.totalInvestments || 0, 0)));
+    return maxVal > 0 ? maxVal : 100;
+  }, [projections?.timeline]);
+
+  const budgetGuidance = useMemo(() => {
+    if (!data?.plannedBudget || !projections?.currentMonthStats) return null;
+    const totalExpenses = projections.currentMonthStats.monthTotalExpenses || 0;
+    if (data.plannedBudget <= totalExpenses) return null;
+
+    const today = new Date().getDate();
+    const daysRemaining = Math.max(1, (projections.daysInCurrentMonth || 30) - today + 1);
+    const remainingBudget = data.plannedBudget - totalExpenses;
+    const safeDaily = remainingBudget / daysRemaining;
+    const safeWeekly = safeDaily * 7;
+
+    return { daysRemaining, safeDaily, safeWeekly };
+  }, [data?.plannedBudget, projections?.currentMonthStats, projections?.daysInCurrentMonth]);
+
+  const dailyChartMetrics = useMemo(() => {
+    if (!data?.plannedBudget || !projections?.daysInCurrentMonth) {
+      return { dailyTarget: 0, safeMax: 1, budgetLinePct: 0 };
+    }
+    const dailyTarget = data.plannedBudget / projections.daysInCurrentMonth;
+    const maxDailyVal = Math.max(dailyTarget * 1.5, ...(projections.dailySpending || []).map(d => d.amount || 0));
+    const safeMax = maxDailyVal > 0 ? maxDailyVal : 1;
+    const budgetLinePct = Math.min((dailyTarget / safeMax) * 100, 100);
+
+    return { dailyTarget, safeMax, budgetLinePct };
+  }, [data?.plannedBudget, projections?.daysInCurrentMonth, projections?.dailySpending]);
+
+  if (!projections?.currentMonthStats) return null;
+
+  const currentExpenses = projections.currentMonthStats.monthTotalExpenses || 0;
+  const plannedBudget = data?.plannedBudget || 0;
+  const budgetRatio = plannedBudget > 0 ? (currentExpenses / plannedBudget) : 0;
+  const budgetPctFormatted = (budgetRatio * 100).toFixed(1);
 
   return (
     <div className="space-y-6">
@@ -37,7 +71,7 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Fixos: {formatCurrency(projections.currentMonthStats.monthFixedExpenses)} | Variáveis: {formatCurrency(projections.currentMonthStats.monthVariableExpenses)}
                 </p>
-                {projections.prevMonthStats.totalExpenses > 0 && (
+                {projections.prevMonthStats?.totalExpenses > 0 && (
                   <div className={`flex items-center gap-1 text-[10px] font-medium ${
                     projections.currentMonthStats.monthTotalExpenses > projections.prevMonthStats.totalExpenses ? 'text-red-500' : 'text-green-500'
                   }`}>
@@ -110,19 +144,19 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
       </div>
 
       {/* ALERTA DE ORÇAMENTO */}
-      {data.plannedBudget > 0 && (
+      {plannedBudget > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
           <div className="flex justify-between items-end mb-2">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">🎯 Planejamento de Gastos (Mês Atual)</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Você gastou {formatCurrency(projections.currentMonthStats.monthTotalExpenses)} de um limite de {formatCurrency(data.plannedBudget)}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Você gastou {formatCurrency(currentExpenses)} de um limite de {formatCurrency(plannedBudget)}</p>
             </div>
             <div className="text-right">
               <span className={`text-xl font-bold ${
-                (projections.currentMonthStats.monthTotalExpenses / data.plannedBudget) >= 1 ? 'text-red-600 dark:text-red-400' :
-                (projections.currentMonthStats.monthTotalExpenses / data.plannedBudget) >= 0.8 ? 'text-orange-500' : 'text-green-600 dark:text-green-400'
+                budgetRatio >= 1 ? 'text-red-600 dark:text-red-400' :
+                budgetRatio >= 0.8 ? 'text-orange-500' : 'text-green-600 dark:text-green-400'
               }`}>
-                {((projections.currentMonthStats.monthTotalExpenses / data.plannedBudget) * 100).toFixed(1)}%
+                {budgetPctFormatted}%
               </span>
             </div>
           </div>
@@ -130,64 +164,42 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mt-4 overflow-hidden flex">
             <div
               className={`h-3 transition-all duration-500 ${
-                (projections.currentMonthStats.monthTotalExpenses / data.plannedBudget) >= 1 ? 'bg-red-500' :
-                (projections.currentMonthStats.monthTotalExpenses / data.plannedBudget) >= 0.8 ? 'bg-orange-500' : 'bg-green-500'
+                budgetRatio >= 1 ? 'bg-red-500' :
+                budgetRatio >= 0.8 ? 'bg-orange-500' : 'bg-green-500'
               }`}
-              style={{ width: `${Math.min((projections.currentMonthStats.monthTotalExpenses / data.plannedBudget) * 100, 100)}%` }}
+              style={{ width: `${Math.min(budgetRatio * 100, 100)}%` }}
             ></div>
           </div>
 
-          {data.plannedBudget > projections.currentMonthStats.monthTotalExpenses && (
+          {budgetGuidance && (
             <div className="mt-5 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/30 transition-colors duration-300">
-              {(() => {
-                const today = new Date().getDate();
-                const daysRemaining = Math.max(1, projections.daysInCurrentMonth - today + 1);
-                const remainingBudget = data.plannedBudget - projections.currentMonthStats.monthTotalExpenses;
-                const safeDaily = remainingBudget / daysRemaining;
-                const safeWeekly = safeDaily * 7;
-                return (
-                  <>
-                    <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 Para não estourar o limite nestes {daysRemaining} dias que faltam, você pode gastar:</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div><p className="text-xs text-blue-600 dark:text-blue-400">Por Semana (aprox.)</p><p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(safeWeekly)}</p></div>
-                      <div><p className="text-xs text-blue-600 dark:text-blue-400">Por Dia</p><p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(safeDaily)}</p></div>
-                    </div>
-                  </>
-                )
-              })()}
+              <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">💡 Para não estourar o limite nestes {budgetGuidance.daysRemaining} dias que faltam, você pode gastar:</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div><p className="text-xs text-blue-600 dark:text-blue-400">Por Semana (aprox.)</p><p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(budgetGuidance.safeWeekly)}</p></div>
+                <div><p className="text-xs text-blue-600 dark:text-blue-400">Por Dia</p><p className="text-lg font-bold text-blue-700 dark:text-blue-300">{formatCurrency(budgetGuidance.safeDaily)}</p></div>
+              </div>
             </div>
           )}
 
           <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 transition-colors duration-300">
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-6 flex items-center gap-2"><BarChart3 size={16} className="text-blue-500" /> Gastos por Dia (Mês Atual)</h4>
               <div className="h-28 flex items-end gap-1 relative w-full mt-2">
-                  {(() => {
-                      const dailyTarget = data.plannedBudget / projections.daysInCurrentMonth;
-                      const maxDailyVal = Math.max(dailyTarget * 1.5, ...projections.dailySpending.map(d => d.amount));
-                      const safeMax = maxDailyVal > 0 ? maxDailyVal : 1;
-                      const budgetLinePct = (dailyTarget / safeMax) * 100;
-                      return (
-                          <div className="absolute left-0 w-full border-t border-dashed border-red-400 dark:border-red-600 z-0 flex items-end justify-end" style={{ bottom: `${Math.min(budgetLinePct, 100)}%` }}>
-                              <span className="text-[10px] text-red-500 bg-white dark:bg-gray-800 px-1 -translate-y-1/2 rounded">Média Ideal/Dia</span>
-                          </div>
-                      );
-                  })()}
-                  {projections.dailySpending.map((dayData, idx) => {
-                      const dailyTarget = data.plannedBudget / projections.daysInCurrentMonth;
-                      const maxVal = Math.max(dailyTarget * 1.5, ...projections.dailySpending.map(d => d.amount));
-                      const safeMax = maxVal > 0 ? maxVal : 1;
-                      const heightPct = (dayData.amount / safeMax) * 100;
-                      return (
-                          <div key={idx} className="flex-1 flex flex-col justify-end items-center relative group z-10 h-full">
-                               {dayData.amount > 0 && (
-                                 <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] py-1 px-2 rounded pointer-events-none whitespace-nowrap z-20 shadow-lg transition-opacity">
-                                    Dia {dayData.day}<br/>{formatCurrency(dayData.amount)}
-                                 </div>
-                               )}
-                               <div className={`w-full max-w-[12px] rounded-t-[2px] transition-all duration-300 ${dayData.amount > dailyTarget ? 'bg-red-400 dark:bg-red-500' : 'bg-blue-400 dark:bg-blue-500'}`} style={{ height: `${Math.min(heightPct, 100)}%` }}></div>
-                          </div>
-                      )
-                  })}
+                <div className="absolute left-0 w-full border-t border-dashed border-red-400 dark:border-red-600 z-0 flex items-end justify-end" style={{ bottom: `${dailyChartMetrics.budgetLinePct}%` }}>
+                    <span className="text-[10px] text-red-500 bg-white dark:bg-gray-800 px-1 -translate-y-1/2 rounded">Média Ideal/Dia</span>
+                </div>
+                {(projections.dailySpending || []).map((dayData, idx) => {
+                    const heightPct = Math.min((dayData.amount / dailyChartMetrics.safeMax) * 100, 100);
+                    return (
+                        <div key={idx} className="flex-1 flex flex-col justify-end items-center relative group z-10 h-full">
+                             {dayData.amount > 0 && (
+                               <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] py-1 px-2 rounded pointer-events-none whitespace-nowrap z-20 shadow-lg transition-opacity">
+                                  Dia {dayData.day}<br/>{formatCurrency(dayData.amount)}
+                                </div>
+                             )}
+                             <div className={`w-full max-w-[12px] rounded-t-[2px] transition-all duration-300 ${dayData.amount > dailyChartMetrics.dailyTarget ? 'bg-red-400 dark:bg-red-500' : 'bg-blue-400 dark:bg-blue-500'}`} style={{ height: `${heightPct}%` }}></div>
+                        </div>
+                    );
+                })}
               </div>
               <div className="flex justify-between text-[10px] text-gray-400 mt-2">
                   <span>Dia 1</span><span>Dia 15</span><span>Dia {projections.daysInCurrentMonth}</span>
@@ -214,9 +226,8 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
             <div className="ml-16 flex-1 flex items-end justify-between h-full relative">
               <div className="absolute w-full h-px bg-gray-200 dark:bg-gray-700 bottom-0"></div>
               {projections.timeline.map((point, idx) => {
-                const safeMax = maxChartValue || 1;
-                const balanceHeight = Math.max(0, (point.netBalance / safeMax) * 100);
-                const investHeight = Math.max(0, (point.totalInvestments / safeMax) * 100);
+                const balanceHeight = Math.max(0, (point.netBalance / maxChartValue) * 100);
+                const investHeight = Math.max(0, (point.totalInvestments / maxChartValue) * 100);
                 return (
                   <div key={idx} className="flex flex-col items-center flex-1 group">
                     <div className="flex gap-1 items-end h-[200px] w-full justify-center relative">
@@ -230,7 +241,7 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
                     </div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-2">{point.label}</span>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -270,3 +281,4 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
     </div>
   );
 });
+

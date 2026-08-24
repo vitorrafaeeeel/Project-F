@@ -65,44 +65,56 @@ export const ExpensesPage = memo(({ data, expenseFilter, setExpenseFilter, filte
           <>
             <div className="px-6 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">Saídas e Gastos</div>
             <ul className="divide-y divide-gray-100 dark:divide-gray-700">
-              {filteredExpenses.map((expense) => {
-                const [ey, em] = expense.date ? expense.date.split('-').map(Number) : [new Date().getFullYear(), new Date().getMonth() + 1];
-                const monthsSincePurchase = (new Date().getFullYear() - ey) * 12 + (new Date().getMonth() - (em - 1));
-                const isFutureInstallment = expense.installments > 1 && monthsSincePurchase < expense.installments;
-                const currentInstallment = monthsSincePurchase + 1;
-                const cat = categoryConfig[expense.category] || categoryConfig['outros'];
-                const isPending = expense.appliedToBalance === false;
+              {(() => {
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth();
 
-                return (
-                <li key={expense.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-2 h-10 rounded-full ${isPending ? 'bg-gray-300 dark:bg-gray-600' : cat.color}`}></div>
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                        {expense.desc}
-                        {isFutureInstallment && <span className="text-[10px] flex items-center gap-1 text-orange-600 bg-orange-100 dark:bg-orange-900/40 dark:text-orange-400 px-2 py-0.5 rounded-full font-semibold"><ArrowRight size={10} /> Parcela {Math.max(1, currentInstallment)}/{expense.installments}</span>}
-                        {isPending && <span className="text-[10px] bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400 px-2 py-0.5 rounded-full">Agendado</span>}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span className="text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded">{cat.label}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">• {expense.type === 'fixed' ? 'Fixo' : 'Variável'} • {expense.paymentMethod === 'credit' ? ' Crédito' : expense.paymentMethod === 'debit' ? ' Débito' : expense.paymentMethod === 'cash' ? ' Dinheiro' : ' PIX'}{expense.deductedFromBalance && !isPending && <span className="text-blue-500 font-medium ml-1"> (Descontado)</span>}</span>
-                        {expense.date && <span className="text-[10px] flex items-center gap-1 text-gray-400 ml-1"><Calendar size={10} /> {formatDate(expense.date)}</span>}
+                return filteredExpenses.map((expense) => {
+                  let ey = currentYear;
+                  let em = currentMonth + 1;
+                  if (expense.date) {
+                    const parts = expense.date.split('-');
+                    ey = Number(parts[0]) || currentYear;
+                    em = Number(parts[1]) || (currentMonth + 1);
+                  }
+                  const monthsSincePurchase = (currentYear - ey) * 12 + (currentMonth - (em - 1));
+                  const isFutureInstallment = expense.installments > 1 && monthsSincePurchase < expense.installments;
+                  const currentInstallment = monthsSincePurchase + 1;
+                  const cat = categoryConfig[expense.category] || categoryConfig['outros'];
+                  const isPending = expense.appliedToBalance === false;
+
+                  return (
+                    <li key={expense.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-2 h-10 rounded-full ${isPending ? 'bg-gray-300 dark:bg-gray-600' : cat.color}`}></div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            {expense.desc}
+                            {isFutureInstallment && <span className="text-[10px] flex items-center gap-1 text-orange-600 bg-orange-100 dark:bg-orange-900/40 dark:text-orange-400 px-2 py-0.5 rounded-full font-semibold"><ArrowRight size={10} /> Parcela {Math.max(1, currentInstallment)}/{expense.installments}</span>}
+                            {isPending && <span className="text-[10px] bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400 px-2 py-0.5 rounded-full">Agendado</span>}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <span className="text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded">{cat.label}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">• {expense.type === 'fixed' ? 'Fixo' : 'Variável'} • {expense.paymentMethod === 'credit' ? ' Crédito' : expense.paymentMethod === 'debit' ? ' Débito' : expense.paymentMethod === 'cash' ? ' Dinheiro' : ' PIX'}{expense.deductedFromBalance && !isPending && <span className="text-blue-500 font-medium ml-1"> (Descontado)</span>}</span>
+                            {expense.date && <span className="text-[10px] flex items-center gap-1 text-gray-400 ml-1"><Calendar size={10} /> {formatDate(expense.date)}</span>}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="text-right">
-                      <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(expense.amount)}</span>
-                      {expense.installments > 1 && <p className="text-xs text-gray-500 dark:text-gray-400">{expense.installments}x de {formatCurrency(expense.amount / expense.installments)}</p>}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => setEditExpenseModal({ isOpen: true, data: { ...expense } })} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"><Edit2 size={16} /></button>
-                      <button onClick={() => handleDeleteExpense(expense.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"><Trash2 size={18} /></button>
-                    </div>
-                  </div>
-                </li>
-                );
-              })}
+                      <div className="flex items-center gap-2 sm:gap-4">
+                        <div className="text-right">
+                          <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(expense.amount)}</span>
+                          {expense.installments > 1 && <p className="text-xs text-gray-500 dark:text-gray-400">{expense.installments}x de {formatCurrency(expense.amount / expense.installments)}</p>}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => setEditExpenseModal({ isOpen: true, data: { ...expense } })} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"><Edit2 size={16} /></button>
+                          <button onClick={() => handleDeleteExpense(expense.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"><Trash2 size={18} /></button>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                });
+              })()}
             </ul>
           </>
         )}
