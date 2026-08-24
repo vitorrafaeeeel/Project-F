@@ -25,9 +25,11 @@ export const Header = memo(({
     }
     if (dropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, [dropdownOpen]);
 
@@ -35,41 +37,41 @@ export const Header = memo(({
   const userEmail = profile?.email || user?.email || '';
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm relative z-20 transition-colors duration-300 border-b border-gray-100 dark:border-gray-700/60">
-      <div className="max-w-6xl mx-auto px-4 py-3.5 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <header className="bg-white dark:bg-gray-800 shadow-sm relative z-50 transition-colors duration-300 border-b border-gray-100 dark:border-gray-700/60">
+      <div className="max-w-6xl mx-auto px-4 py-3.5 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         
         {/* Logo / Marca interativa */}
         <button
           type="button"
           onClick={() => setActiveTab('dashboard')}
-          className="flex items-center gap-3 cursor-pointer hover:opacity-85 transition-all focus:outline-none group text-left"
+          className="flex items-center gap-3 cursor-pointer hover:opacity-85 transition-all focus:outline-none group text-left shrink-0"
           title="Ir para o Início / Dashboard"
         >
           <div className="p-2 bg-blue-600 group-hover:bg-blue-700 rounded-xl text-white transition-all shadow-sm group-hover:scale-105">
-            <TrendingUp size={24} />
+            <TrendingUp size={22} />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
               Finanças Simplificadas
             </h1>
           </div>
         </button>
 
         {/* Navegação de Abas e Menu do Usuário */}
-        <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
+        <div className="flex items-center gap-2 sm:gap-6">
           
           {/* Links de navegação soltos e flutuando sem nenhum card ou fundo cinza */}
-          <nav className="flex items-center gap-1 sm:gap-4 flex-nowrap min-w-max">
+          <nav className="flex items-center gap-1 sm:gap-3 overflow-x-auto hide-scrollbar">
             <button
               type="button"
               onClick={() => setActiveTab('dashboard')}
-              className={`flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors relative ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
                 activeTab === 'dashboard'
                   ? 'text-blue-600 dark:text-blue-400 font-semibold'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <LayoutDashboard size={18} />
+              <LayoutDashboard size={17} />
               <span>Resumo</span>
               {activeTab === 'dashboard' && (
                 <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
@@ -79,13 +81,13 @@ export const Header = memo(({
             <button
               type="button"
               onClick={() => setActiveTab('expenses')}
-              className={`flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors relative ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
                 activeTab === 'expenses'
                   ? 'text-blue-600 dark:text-blue-400 font-semibold'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <Receipt size={18} />
+              <Receipt size={17} />
               <span>Transações</span>
               {activeTab === 'expenses' && (
                 <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
@@ -95,13 +97,13 @@ export const Header = memo(({
             <button
               type="button"
               onClick={() => setActiveTab('calendar')}
-              className={`flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors relative ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
                 activeTab === 'calendar'
                   ? 'text-blue-600 dark:text-blue-400 font-semibold'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <CalendarDays size={18} />
+              <CalendarDays size={17} />
               <span>Calendário</span>
               {activeTab === 'calendar' && (
                 <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
@@ -111,13 +113,13 @@ export const Header = memo(({
             <button
               type="button"
               onClick={() => setActiveTab('investments')}
-              className={`flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors relative ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
                 activeTab === 'investments'
                   ? 'text-blue-600 dark:text-blue-400 font-semibold'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <PiggyBank size={18} />
+              <PiggyBank size={17} />
               <span>Investimentos</span>
               {activeTab === 'investments' && (
                 <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
@@ -126,11 +128,12 @@ export const Header = memo(({
           </nav>
 
           {/* Menu Dropdown do Usuário ("Olá, Vitor") */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative shrink-0" ref={dropdownRef}>
             <button
               type="button"
               onClick={() => setDropdownOpen(prev => !prev)}
-              className="flex items-center gap-2.5 py-1.5 px-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/70 dark:hover:bg-gray-700/50 transition-colors focus:outline-none cursor-pointer"
+              className="flex items-center gap-2.5 py-1.5 px-2.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/60 transition-colors focus:outline-none cursor-pointer select-none"
+              aria-haspopup="true"
               aria-expanded={dropdownOpen}
               title="Menu do Usuário"
             >
@@ -157,9 +160,9 @@ export const Header = memo(({
               />
             </button>
 
-            {/* Dropdown Menu Flutuante */}
+            {/* Dropdown Menu Flutuante - z-50 com overflow-hidden para não ter barra de rolagem */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                 {/* Header com Identificação do Usuário */}
                 <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-700/80">
                   <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Conectado como</p>
@@ -168,14 +171,14 @@ export const Header = memo(({
                 </div>
 
                 {/* Opções do Menu */}
-                <div className="py-1.5 px-1 space-y-0.5">
+                <div className="py-1 px-1 space-y-0.5">
                   <button
                     type="button"
                     onClick={() => {
                       setDropdownOpen(false);
                       onOpenSettings('profile');
                     }}
-                    className="w-full px-3.5 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
                   >
                     <User size={16} className="text-gray-500 dark:text-gray-400" />
                     <span>Editar Perfil</span>
@@ -187,7 +190,7 @@ export const Header = memo(({
                       setDropdownOpen(false);
                       onOpenSettings('finance');
                     }}
-                    className="w-full px-3.5 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
                   >
                     <SlidersHorizontal size={16} className="text-gray-500 dark:text-gray-400" />
                     <span>Editar Informações</span>
@@ -199,7 +202,7 @@ export const Header = memo(({
                       setDropdownOpen(false);
                       onOpenSettings('appearance');
                     }}
-                    className="w-full px-3.5 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
                   >
                     <Settings size={16} className="text-gray-500 dark:text-gray-400" />
                     <span>Configurações Gerais</span>
@@ -207,14 +210,14 @@ export const Header = memo(({
                 </div>
 
                 {/* Sair */}
-                <div className="border-t border-gray-100 dark:border-gray-700/80 pt-1.5 px-1 mt-1">
+                <div className="border-t border-gray-100 dark:border-gray-700/80 pt-1 px-1">
                   <button
                     type="button"
                     onClick={() => {
                       setDropdownOpen(false);
                       onLogout();
                     }}
-                    className="w-full px-3.5 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center gap-2.5 transition-colors font-semibold cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center gap-2.5 transition-colors font-semibold cursor-pointer"
                   >
                     <LogOut size={16} />
                     <span>Sair</span>
@@ -229,6 +232,7 @@ export const Header = memo(({
     </header>
   );
 });
+
 
 
 
