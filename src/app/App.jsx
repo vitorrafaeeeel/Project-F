@@ -110,8 +110,10 @@ export default function App() {
   } = useInvestmentActions(data, updateData);
 
   const {
-    editIncome, setEditIncome, editBalance, setEditBalance, editBudget, setEditBudget, handleUpdateAccount
-  } = useAccountSettingsForm(data, updateData);
+    editIncome, setEditIncome, editBalance, setEditBalance, editBudget, setEditBudget,
+    fullName, setFullName, email, cpf, setCpf, birthDate, setBirthDate, phone, setPhone,
+    avatarUrl, setAvatarUrl, isSaving, handleUpdateAccount
+  } = useAccountSettingsForm(data, updateData, user, profile);
 
   const handleSaveSettings = useCallback(() => {
     handleUpdateAccount(handleCloseModal);
@@ -210,8 +212,8 @@ export default function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           firstName={firstName}
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
+          profile={profile}
+          user={user}
           onOpenSettings={handleOpenSettings}
           onLogout={handleLogout}
         />
@@ -240,7 +242,15 @@ export default function App() {
               editIncome={editIncome} setEditIncome={setEditIncome}
               editBalance={editBalance} setEditBalance={setEditBalance}
               editBudget={editBudget} setEditBudget={setEditBudget}
+              fullName={fullName} setFullName={setFullName}
+              email={email}
+              cpf={cpf} setCpf={setCpf}
+              birthDate={birthDate} setBirthDate={setBirthDate}
+              phone={phone} setPhone={setPhone}
+              avatarUrl={avatarUrl} setAvatarUrl={setAvatarUrl}
+              isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode}
               onSave={handleSaveSettings}
+              isSaving={isSaving}
             />
           )}
 
