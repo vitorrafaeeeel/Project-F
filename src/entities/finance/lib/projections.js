@@ -125,13 +125,21 @@ export function computeProjections(data) {
 
     let monthTotalInvestments = 0;
     runningInvestments = runningInvestments.map(inv => {
-      const rate = inv.interestRate || 0;
-      const monthly = inv.monthlyAmount || 0;
-      const current = inv.currentBalance || 0;
+      let rate = Number(inv.interestRate) || 0;
+      // Normaliza se estiver em percentual (ex: 0.8 para 0.8% a.m. ou 10 para 10%)
+      if (rate > 0.15) {
+        rate = rate / 100;
+      }
+      // Limite de segurança de rendimento mensal (max 3% ao mês)
+      rate = Math.min(Math.max(rate, 0), 0.03);
+
+      const monthly = Number(inv.monthlyAmount) || 0;
+      const current = Number(inv.currentBalance) || 0;
       const newBalance = i === 0 ? current * (1 + rate) : (current * (1 + rate)) + monthly;
       monthTotalInvestments += newBalance;
       return { ...inv, currentBalance: newBalance };
     });
+
 
     const point = {
       label: `${monthsNames[monthIdx]}/${year.toString().slice(-2)}`,
