@@ -1,27 +1,37 @@
 export const formatCurrency = (value) => {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+  const num = typeof value === 'number' ? value : parseCurrencyInput(value);
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(isNaN(num) ? 0 : num);
 };
 
 export const parseCurrencyInput = (value) => {
-  if (typeof value === 'number') return isNaN(value) ? 0 : value;
+  if (typeof value === 'number') {
+    return isNaN(value) ? 0 : Math.round(value * 100) / 100;
+  }
   if (!value) return 0;
 
-  const cleanStr = String(value).trim();
+  // Remove caracteres alfanuméricos indesejados mantendo dígitos, pontos, vírgulas e sinal negativo
+  let cleanStr = String(value).trim().replace(/[^\d.,-]/g, '');
   if (!cleanStr) return 0;
 
+  // Se contiver ponto e vírgula (ex: 1.500,50 ou 1,500.50)
   if (cleanStr.includes('.') && cleanStr.includes(',')) {
-    const normalized = cleanStr.replace(/\./g, '').replace(',', '.');
-    const parsed = parseFloat(normalized);
-    return isNaN(parsed) ? 0 : parsed;
-  }
-
-  if (cleanStr.includes(',')) {
-    const normalized = cleanStr.replace(',', '.');
-    const parsed = parseFloat(normalized);
-    return isNaN(parsed) ? 0 : parsed;
+    const lastDot = cleanStr.lastIndexOf('.');
+    const lastComma = cleanStr.lastIndexOf(',');
+    if (lastComma > lastDot) {
+      // Formato brasileiro: 1.500,50 -> 1500.50
+      cleanStr = cleanStr.replace(/\./g, '').replace(',', '.');
+    } else {
+      // Formato americano: 1,500.50 -> 1500.50
+      cleanStr = cleanStr.replace(/,/g, '');
+    }
+  } else if (cleanStr.includes(',')) {
+    // Formato com vírgula decimal: 1500,50 -> 1500.50
+    cleanStr = cleanStr.replace(',', '.');
   }
 
   const parsed = parseFloat(cleanStr);
-  return isNaN(parsed) ? 0 : parsed;
+  if (isNaN(parsed)) return 0;
+  return Math.round(parsed * 100) / 100;
 };
+
 

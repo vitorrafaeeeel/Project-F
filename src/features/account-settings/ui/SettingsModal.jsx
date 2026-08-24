@@ -239,6 +239,7 @@ export function SettingsModal({
                 </label>
                 <input
                   type="number"
+                  inputMode="decimal"
                   step="0.01"
                   placeholder="0.00"
                   value={editIncome}
@@ -254,6 +255,7 @@ export function SettingsModal({
                 </label>
                 <input
                   type="number"
+                  inputMode="decimal"
                   step="0.01"
                   placeholder="0.00"
                   value={editBalance}
@@ -269,6 +271,7 @@ export function SettingsModal({
                 </label>
                 <input
                   type="number"
+                  inputMode="decimal"
                   step="0.01"
                   placeholder="0.00"
                   value={editBudget}
@@ -277,6 +280,7 @@ export function SettingsModal({
                 />
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Teto de gastos desejado para o mês atual.</p>
               </div>
+
             </div>
           )}
 
