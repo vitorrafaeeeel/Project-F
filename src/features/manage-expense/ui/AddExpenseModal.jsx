@@ -1,24 +1,14 @@
-import { X, Receipt, Wand2, Sparkles, Plus } from 'lucide-react';
+import { X, Receipt, Plus } from 'lucide-react';
 
 export function AddExpenseModal({
-  onClose, newExpense, setNewExpense, onSubmit,
-  aiSmartInput, setAiSmartInput, aiSmartLoading, handleSmartExpense
+  onClose, newExpense, setNewExpense, onSubmit
 }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors bg-gray-100 dark:bg-gray-700 rounded-full p-1"><X size={20} /></button>
         <h3 className="text-xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-2"><Receipt className="text-red-500" /> Adicionar Gasto</h3>
-        <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-100 dark:border-purple-800/30">
-          <label className="block text-xs font-semibold text-purple-800 dark:text-purple-300 mb-2 uppercase tracking-wide flex items-center gap-1"><Wand2 size={14} /> Preenchimento Mágico ✨</label>
-          <div className="flex gap-2">
-            <input type="text" placeholder="Ex: Gastei 50 reais de mercado no crédito" value={aiSmartInput} onChange={(e) => setAiSmartInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSmartExpense())} className="w-full rounded-md border-purple-200 dark:border-purple-700 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-800 dark:text-white p-2.5 border text-sm"/>
-            <button type="button" onClick={handleSmartExpense} disabled={aiSmartLoading || !aiSmartInput.trim()} className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white px-3 py-2 rounded-md transition-colors flex items-center justify-center min-w-[44px]">
-              {aiSmartLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <Sparkles size={18} />}
-            </button>
-          </div>
-          <p className="text-[10px] text-purple-600 dark:text-purple-400 mt-1.5 leading-tight">Descreva o gasto e a IA preencherá o formulário automaticamente.</p>
-        </div>
+
         <form onSubmit={onSubmit} className="space-y-4">
           <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label><input type="text" required placeholder="Ex: Aluguel, Mercado..." autoFocus value={newExpense.desc} onChange={(e) => setNewExpense({...newExpense, desc: e.target.value})} className="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:text-white p-2.5 border bg-white dark:bg-gray-700"/></div>
           <div className="grid grid-cols-2 gap-4">
