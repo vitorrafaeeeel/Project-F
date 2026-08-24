@@ -86,12 +86,18 @@ export default function App() {
     await signOut(auth);
   }, [resetMessages]);
 
+  const [settingsInitialTab, setSettingsInitialTab] = useState('profile');
+
   // --- HANDLERS MEMOIZADOS PARA EVITAR RE-RENDERS ---
-  const handleOpenSettings = useCallback(() => setModalType('settings'), []);
+  const handleOpenSettings = useCallback((section = 'profile') => {
+    setSettingsInitialTab(section);
+    setModalType('settings');
+  }, []);
   const handleCloseModal = useCallback(() => setModalType(null), []);
   const handleOpenIncome = useCallback(() => setModalType('income'), []);
   const handleOpenExpense = useCallback(() => setModalType('expense'), []);
   const handleOpenInvestment = useCallback(() => setModalType('investment'), []);
+
 
   // --- FEATURES DE GESTÃO FINANCEIRA ---
   const {
@@ -239,6 +245,7 @@ export default function App() {
           {modalType === 'settings' && (
             <SettingsModal
               onClose={handleCloseModal}
+              initialSection={settingsInitialTab}
               editIncome={editIncome} setEditIncome={setEditIncome}
               editBalance={editBalance} setEditBalance={setEditBalance}
               editBudget={editBudget} setEditBudget={setEditBudget}
@@ -253,6 +260,7 @@ export default function App() {
               isSaving={isSaving}
             />
           )}
+
 
           {modalType === 'income' && (
             <AddIncomeModal

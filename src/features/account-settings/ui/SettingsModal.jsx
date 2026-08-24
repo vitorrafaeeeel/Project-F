@@ -7,6 +7,7 @@ import {
 
 export function SettingsModal({
   onClose,
+  initialSection = 'profile',
   // Dados financeiros
   editIncome, setEditIncome,
   editBalance, setEditBalance,
@@ -23,8 +24,9 @@ export function SettingsModal({
   // Ações
   onSave, isSaving
 }) {
-  const [activeSection, setActiveSection] = useState('profile'); // 'profile' | 'finance' | 'appearance'
+  const [activeSection, setActiveSection] = useState(initialSection); // 'profile' | 'finance' | 'appearance'
   const fileInputRef = useRef(null);
+
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];

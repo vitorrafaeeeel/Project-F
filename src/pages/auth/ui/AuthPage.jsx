@@ -27,9 +27,10 @@ export const AuthPage = memo(({ isDarkMode, setIsDarkMode, onSubmit, onPasswordR
                 <TrendingUp size={24} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Financas Plus</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Finanças Simplificadas</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Acesse seu painel financeiro</p>
               </div>
+
             </div>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" title="Alternar tema">
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
