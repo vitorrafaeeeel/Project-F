@@ -13,28 +13,18 @@ import {
 } from '../../config/env.js';
 
 const firebaseConfig = {
-  apiKey: firebaseApiKey,
-  authDomain: firebaseAuthDomain,
-  projectId: firebaseProjectId,
-  storageBucket: firebaseStorageBucket,
-  messagingSenderId: firebaseMessagingSenderId,
-  appId: firebaseAppId,
-  measurementId: firebaseMeasurementId
+  apiKey: firebaseApiKey || "AIzaSyCnwLv4djcrm-qgA0Hw7cJtSpy6aU5TCAE",
+  authDomain: firebaseAuthDomain || "project-f-77ed8.firebaseapp.com",
+  projectId: firebaseProjectId || "project-f-77ed8",
+  storageBucket: firebaseStorageBucket || "project-f-77ed8.appspot.com",
+  messagingSenderId: firebaseMessagingSenderId || "261138589545",
+  appId: firebaseAppId || "1:261138589545:web:c04130007812cf691fa68c",
+  measurementId: firebaseMeasurementId || "G-ETLN1M012M"
 };
-
-// Diagnóstico seguro em desenvolvimento para inspecionar credenciais
-if (import.meta.env.DEV) {
-  if (!firebaseApiKey || firebaseApiKey.includes('SUA_CHAVE')) {
-    console.warn(
-      '[Firebase Client] ATENÇÃO: Chave de API do Firebase não configurada ou inválida. Verifique o arquivo .env.local.'
-    );
-  } else {
-    console.log('[Firebase Client] Inicializado com sucesso para o projeto:', firebaseProjectId);
-  }
-}
 
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
 
