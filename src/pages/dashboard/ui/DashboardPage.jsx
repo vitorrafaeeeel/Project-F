@@ -1,11 +1,11 @@
 import { memo, useMemo } from 'react';
 import {
-  DollarSign, ArrowDownCircle, Wallet, Sparkles, Bot, BarChart3, TrendingUp, ArrowDownRight, ArrowUpRight, Target
+  DollarSign, ArrowDownCircle, Wallet, BarChart3, TrendingUp, ArrowDownRight, ArrowUpRight, Target
 } from 'lucide-react';
 import { formatCurrency } from '../../../shared/lib/currency.js';
 import { categoryConfig } from '../../../entities/expense/model/categories.js';
 
-export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoading, handleGenerateInsight, categoryUsage, onOpenCategoryBudgets }) => {
+export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoading, handleGenerateInsight }) => {
   const maxChartValue = useMemo(() => {
     if (!projections?.timeline || projections.timeline.length === 0) return 100;
     const maxVal = Math.max(...projections.timeline.map(t => Math.max(t.netBalance || 0, t.totalInvestments || 0, 0)));
@@ -105,46 +105,6 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
         </div>
       </div>
 
-      {/* AI ADVISOR */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 shadow-sm border border-blue-100 dark:border-blue-800/30 transition-colors duration-300">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-600 text-white rounded-full shadow-md">
-              <Sparkles size={24} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100 flex items-center gap-2">Consultor Inteligente ✨</h3>
-              <p className="text-sm text-blue-700 dark:text-blue-300/80">Análise baseada nos seus dados deste mês com Inteligência Artificial.</p>
-            </div>
-          </div>
-          {!aiInsight && !aiInsightLoading && (
-            <button
-              onClick={() => handleGenerateInsight(projections.currentMonthStats)}
-              className="whitespace-nowrap px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow transition-colors flex items-center gap-2"
-            >
-              <Bot size={18} /> Gerar Insight
-            </button>
-          )}
-        </div>
-
-        {aiInsightLoading && (
-          <div className="mt-4 p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg shadow-sm border border-blue-100 dark:border-blue-800/50 flex items-center gap-3">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-300">A IA está analisando suas finanças...</span>
-          </div>
-        )}
-
-        {aiInsight && !aiInsightLoading && (
-          <div className="mt-4 p-5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm border border-blue-100 dark:border-blue-800/50">
-            <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed italic">"{aiInsight}"</p>
-            <div className="mt-3 text-right">
-              <button onClick={() => handleGenerateInsight(projections.currentMonthStats)} className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
-                Gerar nova análise
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* ALERTA DE ORÇAMENTO */}
       {plannedBudget > 0 && (

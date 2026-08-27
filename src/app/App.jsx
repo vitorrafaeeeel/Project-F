@@ -19,7 +19,6 @@ import { useExpenseActions } from '../features/manage-expense/model/useExpenseAc
 import { useIncomeActions } from '../features/manage-income/model/useIncomeActions.js';
 import { useInvestmentActions } from '../features/manage-investment/model/useInvestmentActions.js';
 import { useAccountSettingsForm } from '../features/account-settings/model/useAccountSettingsForm.js';
-import { useCategoryBudgetsForm } from '../features/manage-category-budgets/model/useCategoryBudgetsForm.js';
 import { useAiInsight } from '../features/ai-insight/model/useAiInsight.js';
 import { useSmartExpense } from '../features/ai-smart-expense/model/useSmartExpense.js';
 
@@ -236,7 +235,7 @@ export default function App() {
 
         <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <Suspense fallback={<PageLoadingFallback />}>
-            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} aiInsight={aiInsight} aiInsightLoading={aiInsightLoading} handleGenerateInsight={handleGenerateInsight} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} />}
+            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} aiInsight={aiInsight} aiInsightLoading={aiInsightLoading} handleGenerateInsight={handleGenerateInsight} />}
             {activeTab === 'calendar' && <CalendarPage calendarData={calendarData} calendarOffset={calendarOffset} setCalendarOffset={setCalendarOffset} setEditExpenseModal={setEditExpenseModal} setEditIncomeModal={setEditIncomeModal} />}
             {activeTab === 'expenses' && <ExpensesPage data={data} expenseFilter={expenseFilter} setExpenseFilter={setExpenseFilter} filteredImpact={filteredImpact} filteredExpenses={filteredExpenses} setEditIncomeModal={setEditIncomeModal} handleDeleteExtraIncome={handleDeleteExtraIncome} setEditExpenseModal={setEditExpenseModal} handleDeleteExpense={handleDeleteExpense} />}
             {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}
@@ -289,12 +288,9 @@ export default function App() {
               newExpense={newExpense}
               setNewExpense={setNewExpense}
               onSubmit={handleAddExpenseSubmit}
-              aiSmartInput={aiSmartInput}
-              setAiSmartInput={setAiSmartInput}
-              aiSmartLoading={aiSmartLoading}
-              handleSmartExpense={handleSmartExpense}
             />
           )}
+
 
           {modalType === 'investment' && (
             <AddInvestmentModal
