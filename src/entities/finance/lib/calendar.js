@@ -10,6 +10,10 @@ export function computeCalendarData(data, projections, calendarOffset) {
   const eventsByDay = {};
   const addEvent = (d, ev) => { const sd = Math.min(d, daysInMonth); if (!eventsByDay[sd]) eventsByDay[sd] = []; eventsByDay[sd].push(ev); };
 
+  if (data.incomePaymentDay && data.income) {
+    addEvent(data.incomePaymentDay, { type: 'income', desc: 'Salário', amount: data.income, synthetic: true });
+  }
+
   (data.extraIncomes || []).forEach(inc => {
       if (!inc.date) return; const [iy, im, id] = inc.date.split('-').map(Number);
       if (iy === targetYear && (im - 1) === targetMonth) addEvent(id, { type: 'income', desc: inc.desc, amount: inc.amount, raw: inc });

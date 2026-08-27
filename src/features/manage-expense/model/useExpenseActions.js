@@ -2,7 +2,12 @@ import { useCallback, useState } from 'react';
 import { getTodayDate } from '../../../shared/lib/date.js';
 import { parseCurrencyInput } from '../../../shared/lib/currency.js';
 
-const emptyNewExpense = () => ({ desc: '', amount: '', type: 'variable', date: getTodayDate(), paymentMethod: 'pix', installments: 1, deductFromBalance: true, category: 'alimentacao' });
+const emptyNewExpense = () => ({ desc: '', amount: '', type: 'variable', date: getTodayDate(), paymentMethod: 'pix', installments: 1, deductFromBalance: true, category: 'alimentacao', items: [] });
+
+// Soma os itens de uma fatura (ex: fatura de 100 = 50 gasolina + 50 almoço).
+function sumItems(items) {
+  return (items || []).reduce((acc, it) => acc + (parseCurrencyInput(it.amount) || 0), 0);
+}
 
 export function useExpenseActions(data, updateData) {
   const [newExpense, setNewExpense] = useState(emptyNewExpense());
@@ -10,8 +15,10 @@ export function useExpenseActions(data, updateData) {
 
   const handleAddExpense = useCallback((e, closeModal) => {
     e.preventDefault();
-    const amount = parseCurrencyInput(newExpense.amount);
+    const hasItems = (newExpense.items || []).length > 0;
+    const amount = hasItems ? sumItems(newExpense.items) : parseCurrencyInput(newExpense.amount);
     if (!newExpense.desc || isNaN(amount) || amount <= 0) return;
+    if (hasItems && newExpense.items.some(it => !it.desc || !(parseCurrencyInput(it.amount) > 0))) return;
     const dateStr = newExpense.date || getTodayDate();
     const isFuture = dateStr > getTodayDate();
     const isCredit = newExpense.paymentMethod === 'credit';
@@ -27,7 +34,8 @@ export function useExpenseActions(data, updateData) {
       installments: isCredit ? parseInt(newExpense.installments) || 1 : 1,
       deductedFromBalance: doDeduct,
       appliedToBalance: willDeductNow ? true : (doDeduct ? false : true),
-      category: newExpense.category
+      category: newExpense.category,
+      items: hasItems ? newExpense.items.map(it => ({ id: it.id || crypto.randomUUID(), desc: it.desc.trim(), amount: parseCurrencyInput(it.amount), category: it.category })) : []
     };
     let newBalance = data?.currentAccountBalance || 0;
     if (willDeductNow) newBalance -= amount;
@@ -39,8 +47,10 @@ export function useExpenseActions(data, updateData) {
   const handleUpdateExpense = useCallback((e) => {
     e.preventDefault();
     if (!editExpenseModal.data) return;
-    const amount = parseCurrencyInput(editExpenseModal.data.amount);
+    const hasItems = (editExpenseModal.data.items || []).length > 0;
+    const amount = hasItems ? sumItems(editExpenseModal.data.items) : parseCurrencyInput(editExpenseModal.data.amount);
     if (!editExpenseModal.data.desc || isNaN(amount) || amount <= 0) return;
+    if (hasItems && editExpenseModal.data.items.some(it => !it.desc || !(parseCurrencyInput(it.amount) > 0))) return;
     const oldExpense = (data?.expenses || []).find(ex => ex.id === editExpenseModal.data.id);
     if (!oldExpense) return;
     let newBalance = data?.currentAccountBalance || 0;
@@ -61,7 +71,8 @@ export function useExpenseActions(data, updateData) {
        installments: isCredit ? parseInt(editExpenseModal.data.installments) || 1 : 1,
        category: editExpenseModal.data.category,
        deductedFromBalance: doDeduct,
-       appliedToBalance: willDeductNow ? true : (doDeduct ? false : true)
+       appliedToBalance: willDeductNow ? true : (doDeduct ? false : true),
+       items: hasItems ? editExpenseModal.data.items.map(it => ({ id: it.id || crypto.randomUUID(), desc: it.desc.trim(), amount: parseCurrencyInput(it.amount), category: it.category })) : []
     };
     updateData?.({
       expenses: (data?.expenses || []).map(ex => ex.id === updatedExpense.id ? updatedExpense : ex),

@@ -81,13 +81,14 @@ export const ExpensesPage = memo(({ data, expenseFilter, setExpenseFilter, filte
                   const monthsSincePurchase = (currentYear - ey) * 12 + (currentMonth - (em - 1));
                   const isFutureInstallment = expense.installments > 1 && monthsSincePurchase < expense.installments;
                   const currentInstallment = monthsSincePurchase + 1;
+                  const hasItems = (expense.items || []).length > 0;
                   const cat = categoryConfig[expense.category] || categoryConfig['outros'];
                   const isPending = expense.appliedToBalance === false;
 
                   return (
                     <li key={expense.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                       <div className="flex items-center gap-4">
-                        <div className={`w-2 h-10 rounded-full ${isPending ? 'bg-gray-300 dark:bg-gray-600' : cat.color}`}></div>
+                        <div className={`w-2 h-10 rounded-full ${isPending ? 'bg-gray-300 dark:bg-gray-600' : hasItems ? 'bg-indigo-500' : cat.color}`}></div>
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
                             {expense.desc}
@@ -95,10 +96,24 @@ export const ExpensesPage = memo(({ data, expenseFilter, setExpenseFilter, filte
                             {isPending && <span className="text-[10px] bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400 px-2 py-0.5 rounded-full">Agendado</span>}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                            <span className="text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded">{cat.label}</span>
+                            {hasItems ? (
+                              <span className="text-[10px] font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded">Fatura • {expense.items.length} itens</span>
+                            ) : (
+                              <span className="text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded">{cat.label}</span>
+                            )}
                             <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">• {expense.type === 'fixed' ? 'Fixo' : 'Variável'} • {expense.paymentMethod === 'credit' ? ' Crédito' : expense.paymentMethod === 'debit' ? ' Débito' : expense.paymentMethod === 'cash' ? ' Dinheiro' : ' PIX'}{expense.deductedFromBalance && !isPending && <span className="text-blue-500 font-medium ml-1"> (Descontado)</span>}</span>
                             {expense.date && <span className="text-[10px] flex items-center gap-1 text-gray-400 ml-1"><Calendar size={10} /> {formatDate(expense.date)}</span>}
                           </div>
+                          {hasItems && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {expense.items.map((it, iIdx) => {
+                                const itCat = categoryConfig[it.category] || categoryConfig['outros'];
+                                return (
+                                  <span key={iIdx} className={`text-[10px] font-medium px-2 py-0.5 rounded-full text-white/90 ${itCat.color}`}>{it.desc} • {formatCurrency(it.amount)}</span>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-4">

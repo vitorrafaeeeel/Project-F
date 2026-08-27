@@ -57,14 +57,16 @@ export const CalendarPage = memo(({ calendarData, calendarOffset, setCalendarOff
                         {ev.type === 'income' ? '+' : '-'} {formatCurrency(ev.amount).replace('R$', '').trim()}
                         <span className="block opacity-75 font-normal truncate">{ev.desc}</span>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (ev.type === 'expense') setEditExpenseModal({ isOpen: true, data: ev.raw });
-                          if (ev.type === 'income') setEditIncomeModal({ isOpen: true, data: ev.raw });
-                        }}
-                        className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/50 hidden group-hover/event:block transition-colors"
-                      ><Pencil size={10} /></button>
+                      {!ev.synthetic && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (ev.type === 'expense') setEditExpenseModal({ isOpen: true, data: ev.raw });
+                            if (ev.type === 'income') setEditIncomeModal({ isOpen: true, data: ev.raw });
+                          }}
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/50 hidden group-hover/event:block transition-colors"
+                        ><Pencil size={10} /></button>
+                      )}
                     </div>
                   ))}
                 </div>

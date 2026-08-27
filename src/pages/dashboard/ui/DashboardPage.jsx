@@ -1,10 +1,11 @@
 import { memo, useMemo } from 'react';
 import {
-  DollarSign, ArrowDownCircle, Wallet, Sparkles, Bot, BarChart3, TrendingUp, ArrowDownRight, ArrowUpRight
+  DollarSign, ArrowDownCircle, Wallet, Sparkles, Bot, BarChart3, TrendingUp, ArrowDownRight, ArrowUpRight, Target
 } from 'lucide-react';
 import { formatCurrency } from '../../../shared/lib/currency.js';
+import { categoryConfig } from '../../../entities/expense/model/categories.js';
 
-export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoading, handleGenerateInsight }) => {
+export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoading, handleGenerateInsight, categoryUsage, onOpenCategoryBudgets }) => {
   const maxChartValue = useMemo(() => {
     if (!projections?.timeline || projections.timeline.length === 0) return 100;
     const maxVal = Math.max(...projections.timeline.map(t => Math.max(t.netBalance || 0, t.totalInvestments || 0, 0)));
@@ -43,6 +44,8 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
   const plannedBudget = data?.plannedBudget || 0;
   const budgetRatio = plannedBudget > 0 ? (currentExpenses / plannedBudget) : 0;
   const budgetPctFormatted = (budgetRatio * 100).toFixed(1);
+  const categoryBudgets = data?.categoryBudgets || [];
+  const totalCategoryBudget = categoryBudgets.reduce((acc, b) => acc + (b.amount || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -207,6 +210,42 @@ export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoad
           </div>
         </div>
       )}
+
+      {/* ORÇAMENTO POR CATEGORIA */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"><Target size={18} className="text-pink-500" /> Orçamento por Categoria</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Limites definidos por categoria (mês atual).</p>
+          </div>
+          <button onClick={onOpenCategoryBudgets} className="text-sm font-medium text-pink-600 hover:text-pink-700 dark:text-pink-400 whitespace-nowrap">Editar</button>
+        </div>
+        {categoryBudgets.length === 0 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum orçamento por categoria definido ainda.</p>
+        ) : (
+          <div className="space-y-4">
+            {categoryBudgets.map(b => {
+              const cat = categoryConfig[b.category] || categoryConfig['outros'];
+              const spent = categoryUsage?.[b.category] || 0;
+              const ratio = b.amount > 0 ? spent / b.amount : 0;
+              return (
+                <div key={b.category}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"><span className={`w-2 h-2 rounded-full ${cat.color}`}></span>{cat.label}</span>
+                    <span className={`text-xs font-semibold ${ratio >= 1 ? 'text-red-600 dark:text-red-400' : ratio >= 0.8 ? 'text-orange-500' : 'text-gray-500 dark:text-gray-400'}`}>{formatCurrency(spent)} / {formatCurrency(b.amount)}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div className={`h-2 transition-all duration-500 ${ratio >= 1 ? 'bg-red-500' : ratio >= 0.8 ? 'bg-orange-500' : 'bg-green-500'}`} style={{ width: `${Math.min(ratio * 100, 100)}%` }}></div>
+                  </div>
+                </div>
+              );
+            })}
+            {totalCategoryBudget > 0 && plannedBudget > 0 && totalCategoryBudget > plannedBudget && (
+              <p className="text-xs text-orange-600 dark:text-orange-400 pt-2 border-t border-gray-100 dark:border-gray-700">⚠️ A soma dos orçamentos por categoria ({formatCurrency(totalCategoryBudget)}) ultrapassa o limite planejado de gastos ({formatCurrency(plannedBudget)}).</p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Evolutivo Chart & Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">

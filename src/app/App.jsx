@@ -9,6 +9,7 @@ import { updateFinanceData } from '../entities/finance/model/api.js';
 import { computeProjections } from '../entities/finance/lib/projections.js';
 import { computeCalendarData } from '../entities/finance/lib/calendar.js';
 import { computeFilteredExpenses, computeFilteredImpact } from '../entities/finance/lib/filters.js';
+import { computeCategoryUsage } from '../entities/finance/lib/categoryUsage.js';
 import { useProfile } from '../entities/user/model/useProfile.js';
 import { getFirstName } from '../entities/user/model/getFirstName.js';
 
@@ -18,6 +19,7 @@ import { useExpenseActions } from '../features/manage-expense/model/useExpenseAc
 import { useIncomeActions } from '../features/manage-income/model/useIncomeActions.js';
 import { useInvestmentActions } from '../features/manage-investment/model/useInvestmentActions.js';
 import { useAccountSettingsForm } from '../features/account-settings/model/useAccountSettingsForm.js';
+import { useCategoryBudgetsForm } from '../features/manage-category-budgets/model/useCategoryBudgetsForm.js';
 import { useAiInsight } from '../features/ai-insight/model/useAiInsight.js';
 import { useSmartExpense } from '../features/ai-smart-expense/model/useSmartExpense.js';
 
@@ -32,6 +34,7 @@ const ExpensesPage = lazy(() => import('../pages/expenses/ui/ExpensesPage.jsx').
 const InvestmentsPage = lazy(() => import('../pages/investments/ui/InvestmentsPage.jsx').then(m => ({ default: m.InvestmentsPage })));
 
 const SettingsModal = lazy(() => import('../features/account-settings/ui/SettingsModal.jsx').then(m => ({ default: m.SettingsModal })));
+const CategoryBudgetsModal = lazy(() => import('../features/manage-category-budgets/ui/CategoryBudgetsModal.jsx').then(m => ({ default: m.CategoryBudgetsModal })));
 const AddIncomeModal = lazy(() => import('../features/manage-income/ui/AddIncomeModal.jsx').then(m => ({ default: m.AddIncomeModal })));
 const EditIncomeModal = lazy(() => import('../features/manage-income/ui/EditIncomeModal.jsx').then(m => ({ default: m.EditIncomeModal })));
 const AddExpenseModal = lazy(() => import('../features/manage-expense/ui/AddExpenseModal.jsx').then(m => ({ default: m.AddExpenseModal })));
@@ -93,6 +96,7 @@ export default function App() {
   const handleOpenIncome = useCallback(() => setModalType('income'), []);
   const handleOpenExpense = useCallback(() => setModalType('expense'), []);
   const handleOpenInvestment = useCallback(() => setModalType('investment'), []);
+  const handleOpenCategoryBudgets = useCallback(() => setModalType('categoryBudgets'), []);
 
   // --- FEATURES DE GESTÃO FINANCEIRA ---
   const {
@@ -111,8 +115,13 @@ export default function App() {
   } = useInvestmentActions(data, updateData);
 
   const {
-    editIncome, setEditIncome, editBalance, setEditBalance, editBudget, setEditBudget, handleUpdateAccount
+    editIncome, setEditIncome, editIncomeDay, setEditIncomeDay, editBalance, setEditBalance, editBudget, setEditBudget, handleUpdateAccount
   } = useAccountSettingsForm(data, updateData);
+
+  const {
+    rows: categoryBudgetRows, addRow: addCategoryBudgetRow, updateRow: updateCategoryBudgetRow,
+    removeRow: removeCategoryBudgetRow, handleSaveCategoryBudgets
+  } = useCategoryBudgetsForm(data, updateData);
 
   const { aiInsight, aiInsightLoading, handleGenerateInsight } = useAiInsight(data);
   const { aiSmartInput, setAiSmartInput, aiSmartLoading, handleSmartExpense } = useSmartExpense(newExpense, setNewExpense);
@@ -120,6 +129,10 @@ export default function App() {
   const handleSaveSettings = useCallback(() => {
     handleUpdateAccount(handleCloseModal);
   }, [handleUpdateAccount, handleCloseModal]);
+
+  const handleSaveCategoryBudgetsSubmit = useCallback(() => {
+    handleSaveCategoryBudgets(handleCloseModal);
+  }, [handleSaveCategoryBudgets, handleCloseModal]);
 
   const handleAddIncomeSubmit = useCallback((e) => {
     handleAddExtraIncome(e, handleCloseModal);
@@ -153,7 +166,8 @@ export default function App() {
   const projections = useMemo(() => computeProjections(data), [data]);
   const calendarData = useMemo(() => computeCalendarData(data, projections, calendarOffset), [data, projections, calendarOffset]);
   const filteredExpenses = useMemo(() => computeFilteredExpenses(data?.expenses, expenseFilter), [data?.expenses, expenseFilter]);
-  const filteredImpact = useMemo(() => computeFilteredImpact(filteredExpenses, projections), [filteredExpenses, projections]);
+  const filteredImpact = useMemo(() => computeFilteredImpact(filteredExpenses, projections, expenseFilter), [filteredExpenses, projections, expenseFilter]);
+  const categoryUsage = useMemo(() => computeCategoryUsage(data, projections), [data, projections]);
 
   const firstName = getFirstName(profile, user);
 
@@ -222,7 +236,7 @@ export default function App() {
 
         <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <Suspense fallback={<PageLoadingFallback />}>
-            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} aiInsight={aiInsight} aiInsightLoading={aiInsightLoading} handleGenerateInsight={handleGenerateInsight} />}
+            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} aiInsight={aiInsight} aiInsightLoading={aiInsightLoading} handleGenerateInsight={handleGenerateInsight} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} />}
             {activeTab === 'calendar' && <CalendarPage calendarData={calendarData} calendarOffset={calendarOffset} setCalendarOffset={setCalendarOffset} setEditExpenseModal={setEditExpenseModal} setEditIncomeModal={setEditIncomeModal} />}
             {activeTab === 'expenses' && <ExpensesPage data={data} expenseFilter={expenseFilter} setExpenseFilter={setExpenseFilter} filteredImpact={filteredImpact} filteredExpenses={filteredExpenses} setEditIncomeModal={setEditIncomeModal} handleDeleteExtraIncome={handleDeleteExtraIncome} setEditExpenseModal={setEditExpenseModal} handleDeleteExpense={handleDeleteExpense} />}
             {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}
@@ -242,9 +256,21 @@ export default function App() {
             <SettingsModal
               onClose={handleCloseModal}
               editIncome={editIncome} setEditIncome={setEditIncome}
+              editIncomeDay={editIncomeDay} setEditIncomeDay={setEditIncomeDay}
               editBalance={editBalance} setEditBalance={setEditBalance}
               editBudget={editBudget} setEditBudget={setEditBudget}
               onSave={handleSaveSettings}
+            />
+          )}
+
+          {modalType === 'categoryBudgets' && (
+            <CategoryBudgetsModal
+              onClose={handleCloseModal}
+              rows={categoryBudgetRows}
+              addRow={addCategoryBudgetRow}
+              updateRow={updateCategoryBudgetRow}
+              removeRow={removeCategoryBudgetRow}
+              onSave={handleSaveCategoryBudgetsSubmit}
             />
           )}
 
