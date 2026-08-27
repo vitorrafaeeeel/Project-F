@@ -19,8 +19,7 @@ import { useExpenseActions } from '../features/manage-expense/model/useExpenseAc
 import { useIncomeActions } from '../features/manage-income/model/useIncomeActions.js';
 import { useInvestmentActions } from '../features/manage-investment/model/useInvestmentActions.js';
 import { useAccountSettingsForm } from '../features/account-settings/model/useAccountSettingsForm.js';
-import { useAiInsight } from '../features/ai-insight/model/useAiInsight.js';
-import { useSmartExpense } from '../features/ai-smart-expense/model/useSmartExpense.js';
+import { useCategoryBudgetsForm } from '../features/manage-category-budgets/model/useCategoryBudgetsForm.js';
 
 import { Header } from '../widgets/header/ui/Header.jsx';
 import { QuickActionsFab } from '../widgets/quick-actions-fab/ui/QuickActionsFab.jsx';
@@ -121,9 +120,6 @@ export default function App() {
     rows: categoryBudgetRows, addRow: addCategoryBudgetRow, updateRow: updateCategoryBudgetRow,
     removeRow: removeCategoryBudgetRow, handleSaveCategoryBudgets
   } = useCategoryBudgetsForm(data, updateData);
-
-  const { aiInsight, aiInsightLoading, handleGenerateInsight } = useAiInsight(data);
-  const { aiSmartInput, setAiSmartInput, aiSmartLoading, handleSmartExpense } = useSmartExpense(newExpense, setNewExpense);
 
   const handleSaveSettings = useCallback(() => {
     handleUpdateAccount(handleCloseModal);
@@ -235,7 +231,7 @@ export default function App() {
 
         <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <Suspense fallback={<PageLoadingFallback />}>
-            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} aiInsight={aiInsight} aiInsightLoading={aiInsightLoading} handleGenerateInsight={handleGenerateInsight} />}
+            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} />}
             {activeTab === 'calendar' && <CalendarPage calendarData={calendarData} calendarOffset={calendarOffset} setCalendarOffset={setCalendarOffset} setEditExpenseModal={setEditExpenseModal} setEditIncomeModal={setEditIncomeModal} />}
             {activeTab === 'expenses' && <ExpensesPage data={data} expenseFilter={expenseFilter} setExpenseFilter={setExpenseFilter} filteredImpact={filteredImpact} filteredExpenses={filteredExpenses} setEditIncomeModal={setEditIncomeModal} handleDeleteExtraIncome={handleDeleteExtraIncome} setEditExpenseModal={setEditExpenseModal} handleDeleteExpense={handleDeleteExpense} />}
             {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}

@@ -5,7 +5,7 @@ import {
 import { formatCurrency } from '../../../shared/lib/currency.js';
 import { categoryConfig } from '../../../entities/expense/model/categories.js';
 
-export const DashboardPage = memo(({ projections, data, aiInsight, aiInsightLoading, handleGenerateInsight }) => {
+export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCategoryBudgets }) => {
   const maxChartValue = useMemo(() => {
     if (!projections?.timeline || projections.timeline.length === 0) return 100;
     const maxVal = Math.max(...projections.timeline.map(t => Math.max(t.netBalance || 0, t.totalInvestments || 0, 0)));
