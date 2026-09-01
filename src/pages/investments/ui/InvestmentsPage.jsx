@@ -33,7 +33,7 @@ export const InvestmentsPage = memo(({
   );
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full animate-in fade-in duration-200">
       {/* 1. Cards de Resumo & Sincronização de Metas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total em Investimentos */}
@@ -93,11 +93,12 @@ export const InvestmentsPage = memo(({
           </div>
 
           <button
+            type="button"
             onClick={onNewInvestment}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Plus size={16} />
-            Novo Investimento
+            <span>Novo Investimento</span>
           </button>
         </div>
 
@@ -110,11 +111,12 @@ export const InvestmentsPage = memo(({
               Comece a planejar o seu futuro financeiro adicionando suas metas de aportes e ativos.
             </p>
             <button
+              type="button"
               onClick={onNewInvestment}
               className="mt-5 inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
             >
               <Plus size={16} />
-              Criar Primeiro Investimento
+              <span>Criar Primeiro Investimento</span>
             </button>
           </div>
         ) : (
@@ -160,6 +162,7 @@ export const InvestmentsPage = memo(({
                       <td className="px-6 py-4">
                         <div className="flex justify-center items-center gap-1.5">
                           <button
+                            type="button"
                             onClick={() => setDepositModal({ isOpen: true, invId: inv.id, amount: '' })}
                             className="px-2.5 py-1.5 text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:hover:bg-emerald-600 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                             title="Fazer Aporte"
@@ -168,6 +171,7 @@ export const InvestmentsPage = memo(({
                             <span>Aportar</span>
                           </button>
                           <button
+                            type="button"
                             onClick={() => setEditInvModal({
                               isOpen: true,
                               id: inv.id,
@@ -181,6 +185,7 @@ export const InvestmentsPage = memo(({
                             <Edit size={15} />
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDeleteInvestment(inv.id)}
                             className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors cursor-pointer"
                             title="Remover Investimento"

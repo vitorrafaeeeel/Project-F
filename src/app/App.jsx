@@ -21,6 +21,7 @@ import { useInvestmentActions } from '../features/manage-investment/model/useInv
 import { useAccountSettingsForm } from '../features/account-settings/model/useAccountSettingsForm.js';
 import { useCategoryBudgetsForm } from '../features/manage-category-budgets/model/useCategoryBudgetsForm.js';
 import { useSalaryActions } from '../features/manage-salary/model/useSalaryActions.js';
+import { useGoalActions } from '../features/manage-goal/model/useGoalActions.js';
 
 import { Header } from '../widgets/header/ui/Header.jsx';
 import { QuickActionsFab } from '../widgets/quick-actions-fab/ui/QuickActionsFab.jsx';
@@ -31,6 +32,7 @@ const DashboardPage = lazy(() => import('../pages/dashboard/ui/DashboardPage.jsx
 const CalendarPage = lazy(() => import('../pages/calendar/ui/CalendarPage.jsx').then(m => ({ default: m.CalendarPage })));
 const ExpensesPage = lazy(() => import('../pages/expenses/ui/ExpensesPage.jsx').then(m => ({ default: m.ExpensesPage })));
 const InvestmentsPage = lazy(() => import('../pages/investments/ui/InvestmentsPage.jsx').then(m => ({ default: m.InvestmentsPage })));
+const GoalsPage = lazy(() => import('../pages/goals/ui/GoalsPage.jsx').then(m => ({ default: m.GoalsPage })));
 
 const SettingsModal = lazy(() => import('../features/account-settings/ui/SettingsModal.jsx').then(m => ({ default: m.SettingsModal })));
 const CategoryBudgetsModal = lazy(() => import('../features/manage-category-budgets/ui/CategoryBudgetsModal.jsx').then(m => ({ default: m.CategoryBudgetsModal })));
@@ -42,6 +44,8 @@ const EditExpenseModal = lazy(() => import('../features/manage-expense/ui/EditEx
 const AddInvestmentModal = lazy(() => import('../features/manage-investment/ui/AddInvestmentModal.jsx').then(m => ({ default: m.AddInvestmentModal })));
 const EditInvestmentModal = lazy(() => import('../features/manage-investment/ui/EditInvestmentModal.jsx').then(m => ({ default: m.EditInvestmentModal })));
 const DepositModal = lazy(() => import('../features/manage-investment/ui/DepositModal.jsx').then(m => ({ default: m.DepositModal })));
+const GoalModal = lazy(() => import('../features/manage-goal/ui/GoalModal.jsx').then(m => ({ default: m.GoalModal })));
+const DepositGoalModal = lazy(() => import('../features/manage-goal/ui/DepositGoalModal.jsx').then(m => ({ default: m.DepositGoalModal })));
 
 function PageLoadingFallback() {
   return (
@@ -78,6 +82,7 @@ export default function App() {
   const [calendarOffset, setCalendarOffset] = useState(0);
   const [expenseFilter, setExpenseFilter] = useState('all');
   const [modalType, setModalType] = useState(null);
+  const [settingsSection, setSettingsSection] = useState('profile');
   const [fabOpen, setFabOpen] = useState(false);
 
   // --- AUTENTICAÇÃO ---
@@ -91,18 +96,32 @@ export default function App() {
   }, [resetMessages]);
 
   // --- HANDLERS MEMOIZADOS PARA EVITAR RE-RENDERS ---
-  const [settingsSection, setSettingsSection] = useState('profile');
+  const handleCloseModal = useCallback(() => {
+    setModalType(null);
+  }, []);
+
   const handleOpenSettings = useCallback((section = 'profile') => {
     setSettingsSection(section);
     setModalType('settings');
   }, []);
-  const handleCloseModal = useCallback(() => setModalType(null), []);
-  const handleOpenIncome = useCallback(() => setModalType('income'), []);
-  const handleOpenExpense = useCallback(() => setModalType('expense'), []);
-  const handleOpenInvestment = useCallback(() => setModalType('investment'), []);
-  const handleOpenCategoryBudgets = useCallback(() => setModalType('categoryBudgets'), []);
 
-  // --- FEATURES DE GESTÃO FINANCEIRA ---
+  const handleOpenIncome = useCallback(() => {
+    setModalType('income');
+  }, []);
+
+  const handleOpenExpense = useCallback(() => {
+    setModalType('expense');
+  }, []);
+
+  const handleOpenInvestment = useCallback(() => {
+    setModalType('investment');
+  }, []);
+
+  const handleOpenCategoryBudgets = useCallback(() => {
+    setModalType('categoryBudgets');
+  }, []);
+
+  // --- HOOKS DE ENTIDADES ---
   const {
     newExpense, setNewExpense, editExpenseModal, setEditExpenseModal,
     handleAddExpense, handleUpdateExpense, handleDeleteExpense
@@ -157,6 +176,29 @@ export default function App() {
     handleDeleteSalary
   } = useSalaryActions(data, updateData);
 
+  const {
+    goalModal,
+    setGoalModal,
+    handleOpenAddGoal,
+    handleOpenEditGoal,
+    handleCloseGoalModal,
+    handleSaveGoal,
+    handleDeleteGoal,
+    handleDepositToGoal
+  } = useGoalActions(data, updateData);
+
+  const [depositGoalModal, setDepositGoalModal] = useState({ isOpen: false, goal: null });
+  const handleOpenDepositGoal = useCallback((goal) => {
+    setDepositGoalModal({ isOpen: true, goal });
+  }, []);
+  const handleCloseDepositGoal = useCallback(() => {
+    setDepositGoalModal({ isOpen: false, goal: null });
+  }, []);
+
+  const handleOpenGoalsTab = useCallback(() => {
+    setActiveTab('goals');
+  }, []);
+
   const handleSaveSettings = useCallback(() => {
     handleUpdateAccount(handleCloseModal);
   }, [handleUpdateAccount, handleCloseModal]);
@@ -199,6 +241,41 @@ export default function App() {
   const filteredExpenses = useMemo(() => computeFilteredExpenses(data?.expenses, expenseFilter), [data?.expenses, expenseFilter]);
   const filteredImpact = useMemo(() => computeFilteredImpact(filteredExpenses, projections, expenseFilter), [filteredExpenses, projections, expenseFilter]);
   const categoryUsage = useMemo(() => computeCategoryUsage(data, projections), [data, projections]);
+
+  const totalInvestmentsBalance = useMemo(
+    () => projections?.totalInvestmentsBalance ?? (data?.investments || []).reduce((acc, inv) => acc + (inv.currentBalance || 0), 0),
+    [projections?.totalInvestmentsBalance, data?.investments]
+  );
+
+  const totalInvestmentMonthly = useMemo(
+    () => projections?.totalInvestmentMonthly ?? (data?.investments || []).reduce((acc, inv) => acc + (inv.monthlyAmount || 0), 0),
+    [projections?.totalInvestmentMonthly, data?.investments]
+  );
+
+  const averageInterestRate = useMemo(() => {
+    const invs = data?.investments || [];
+    if (invs.length === 0) return 0.008;
+    const totalBal = invs.reduce((acc, i) => acc + (i.currentBalance || 0), 0);
+    if (totalBal > 0) {
+      return invs.reduce((acc, i) => acc + ((i.currentBalance || 0) * (i.interestRate || 0.008)), 0) / totalBal;
+    }
+    return invs.reduce((acc, i) => acc + (i.interestRate || 0.008), 0) / invs.length;
+  }, [data?.investments]);
+
+  const financialStats = useMemo(() => {
+    const currentMonthStats = projections?.currentMonthStats;
+    const monthTotalIncome = currentMonthStats?.monthTotalIncome || 0;
+    const monthTotalExpenses = currentMonthStats?.monthTotalExpenses || 0;
+    const netSavings = monthTotalIncome - monthTotalExpenses;
+    return {
+      monthTotalIncome,
+      monthTotalExpenses,
+      netSavings,
+      totalInvestmentsBalance,
+      totalInvestmentMonthly,
+      averageInterestRate
+    };
+  }, [projections, totalInvestmentsBalance, totalInvestmentMonthly, averageInterestRate]);
 
   const firstName = getFirstName(profile, user);
 
@@ -267,8 +344,26 @@ export default function App() {
 
         <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <Suspense fallback={<PageLoadingFallback />}>
-            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} onOpenSettings={handleOpenSettings} />}
-            {activeTab === 'calendar' && <CalendarPage calendarData={calendarData} calendarOffset={calendarOffset} setCalendarOffset={setCalendarOffset} setEditExpenseModal={setEditExpenseModal} setEditIncomeModal={setEditIncomeModal} />}
+            {activeTab === 'dashboard' && (
+              <DashboardPage
+                projections={projections}
+                data={data}
+                categoryUsage={categoryUsage}
+                onOpenCategoryBudgets={handleOpenCategoryBudgets}
+                onOpenSettings={handleOpenSettings}
+                onOpenNewGoal={handleOpenAddGoal}
+                onOpenGoalsTab={handleOpenGoalsTab}
+              />
+            )}
+            {activeTab === 'calendar' && (
+              <CalendarPage
+                calendarData={calendarData}
+                calendarOffset={calendarOffset}
+                setCalendarOffset={setCalendarOffset}
+                setEditExpenseModal={setEditExpenseModal}
+                setEditIncomeModal={setEditIncomeModal}
+              />
+            )}
             {activeTab === 'expenses' && (
               <ExpensesPage
                 data={data}
@@ -286,7 +381,26 @@ export default function App() {
                 handleDeleteSalary={handleDeleteSalary}
               />
             )}
-            {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} onNewInvestment={handleOpenInvestment} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}
+            {activeTab === 'investments' && (
+              <InvestmentsPage
+                data={data}
+                projections={projections}
+                onNewInvestment={handleOpenInvestment}
+                setEditInvModal={setEditInvModal}
+                setDepositModal={setDepositModal}
+                handleDeleteInvestment={handleDeleteInvestment}
+              />
+            )}
+            {activeTab === 'goals' && (
+              <GoalsPage
+                data={data}
+                projections={projections}
+                onNewGoal={handleOpenAddGoal}
+                onEditGoal={handleOpenEditGoal}
+                onDeleteGoal={handleDeleteGoal}
+                onOpenDepositGoal={handleOpenDepositGoal}
+              />
+            )}
           </Suspense>
         </main>
 
@@ -297,6 +411,7 @@ export default function App() {
           onNewIncome={handleOpenIncome}
           onNewExpense={handleOpenExpense}
           onNewInvestment={handleOpenInvestment}
+          onNewGoal={handleOpenAddGoal}
         />
 
         <Suspense fallback={null}>
@@ -308,6 +423,27 @@ export default function App() {
               setSalaryData={setSalaryModal}
               onClose={handleCloseSalaryModal}
               onSubmit={handleSaveSalary}
+            />
+          )}
+
+          {goalModal.isOpen && (
+            <GoalModal
+              isOpen={goalModal.isOpen}
+              mode={goalModal.mode}
+              goalData={goalModal.data}
+              setGoalData={setGoalModal}
+              onClose={handleCloseGoalModal}
+              onSubmit={handleSaveGoal}
+              financialStats={financialStats}
+            />
+          )}
+
+          {depositGoalModal.isOpen && depositGoalModal.goal && (
+            <DepositGoalModal
+              isOpen={depositGoalModal.isOpen}
+              goal={depositGoalModal.goal}
+              onClose={handleCloseDepositGoal}
+              onDeposit={handleDepositToGoal}
             />
           )}
 

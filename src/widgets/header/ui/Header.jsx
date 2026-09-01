@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import {
-  LayoutDashboard, Receipt, CalendarDays, PiggyBank,
+  LayoutDashboard, Receipt, CalendarDays, PiggyBank, Target,
   User, SlidersHorizontal, Settings, LogOut, Menu, X
 } from 'lucide-react';
 
@@ -56,7 +56,8 @@ export const Header = memo(({
     { id: 'dashboard', label: 'Resumo', icon: LayoutDashboard },
     { id: 'expenses', label: 'Transações', icon: Receipt },
     { id: 'calendar', label: 'Calendário', icon: CalendarDays },
-    { id: 'investments', label: 'Investimentos', icon: PiggyBank }
+    { id: 'investments', label: 'Investimentos', icon: PiggyBank },
+    { id: 'goals', label: 'Objetivos', icon: Target }
   ];
 
   return (
