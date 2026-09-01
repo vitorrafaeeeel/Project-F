@@ -20,6 +20,7 @@ import { useIncomeActions } from '../features/manage-income/model/useIncomeActio
 import { useInvestmentActions } from '../features/manage-investment/model/useInvestmentActions.js';
 import { useAccountSettingsForm } from '../features/account-settings/model/useAccountSettingsForm.js';
 import { useCategoryBudgetsForm } from '../features/manage-category-budgets/model/useCategoryBudgetsForm.js';
+import { useSalaryActions } from '../features/manage-salary/model/useSalaryActions.js';
 
 import { Header } from '../widgets/header/ui/Header.jsx';
 import { QuickActionsFab } from '../widgets/quick-actions-fab/ui/QuickActionsFab.jsx';
@@ -33,6 +34,7 @@ const InvestmentsPage = lazy(() => import('../pages/investments/ui/InvestmentsPa
 
 const SettingsModal = lazy(() => import('../features/account-settings/ui/SettingsModal.jsx').then(m => ({ default: m.SettingsModal })));
 const CategoryBudgetsModal = lazy(() => import('../features/manage-category-budgets/ui/CategoryBudgetsModal.jsx').then(m => ({ default: m.CategoryBudgetsModal })));
+const SalaryModal = lazy(() => import('../features/manage-salary/ui/SalaryModal.jsx').then(m => ({ default: m.SalaryModal })));
 const AddIncomeModal = lazy(() => import('../features/manage-income/ui/AddIncomeModal.jsx').then(m => ({ default: m.AddIncomeModal })));
 const EditIncomeModal = lazy(() => import('../features/manage-income/ui/EditIncomeModal.jsx').then(m => ({ default: m.EditIncomeModal })));
 const AddExpenseModal = lazy(() => import('../features/manage-expense/ui/AddExpenseModal.jsx').then(m => ({ default: m.AddExpenseModal })));
@@ -132,9 +134,28 @@ export default function App() {
   } = useAccountSettingsForm(data, updateData, user, profile);
 
   const {
-    rows: categoryBudgetRows, addRow: addCategoryBudgetRow, updateRow: updateCategoryBudgetRow,
-    removeRow: removeCategoryBudgetRow, handleSaveCategoryBudgets
+    rows: categoryBudgetRows,
+    addRow: addCategoryBudgetRow,
+    updateRow: updateCategoryBudgetRow,
+    removeRow: removeCategoryBudgetRow,
+    handleSaveCategoryBudgets,
+    plannedBudget: formPlannedBudget,
+    totalAllocated: totalCategoryBudgetAllocated,
+    remainingToAllocate: remainingCategoryBudgetAllocate,
+    isOverBudget: isCategoryBudgetOver,
+    allocationRatio: categoryBudgetAllocationRatio,
+    allocationPercentage: categoryBudgetAllocationPercentage
   } = useCategoryBudgetsForm(data, updateData);
+
+  const {
+    salaryModal,
+    setSalaryModal,
+    handleOpenAddSalary,
+    handleOpenEditSalary,
+    handleCloseSalaryModal,
+    handleSaveSalary,
+    handleDeleteSalary
+  } = useSalaryActions(data, updateData);
 
   const handleSaveSettings = useCallback(() => {
     handleUpdateAccount(handleCloseModal);
@@ -248,7 +269,23 @@ export default function App() {
           <Suspense fallback={<PageLoadingFallback />}>
             {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} onOpenSettings={handleOpenSettings} />}
             {activeTab === 'calendar' && <CalendarPage calendarData={calendarData} calendarOffset={calendarOffset} setCalendarOffset={setCalendarOffset} setEditExpenseModal={setEditExpenseModal} setEditIncomeModal={setEditIncomeModal} />}
-            {activeTab === 'expenses' && <ExpensesPage data={data} expenseFilter={expenseFilter} setExpenseFilter={setExpenseFilter} filteredImpact={filteredImpact} filteredExpenses={filteredExpenses} setEditIncomeModal={setEditIncomeModal} handleDeleteExtraIncome={handleDeleteExtraIncome} setEditExpenseModal={setEditExpenseModal} handleDeleteExpense={handleDeleteExpense} />}
+            {activeTab === 'expenses' && (
+              <ExpensesPage
+                data={data}
+                expenseFilter={expenseFilter}
+                setExpenseFilter={setExpenseFilter}
+                filteredImpact={filteredImpact}
+                filteredExpenses={filteredExpenses}
+                setEditIncomeModal={setEditIncomeModal}
+                handleDeleteExtraIncome={handleDeleteExtraIncome}
+                setEditExpenseModal={setEditExpenseModal}
+                handleDeleteExpense={handleDeleteExpense}
+                onOpenAddIncome={handleOpenIncome}
+                onOpenAddSalary={handleOpenAddSalary}
+                onOpenEditSalary={handleOpenEditSalary}
+                handleDeleteSalary={handleDeleteSalary}
+              />
+            )}
             {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} onNewInvestment={handleOpenInvestment} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}
           </Suspense>
         </main>
@@ -256,12 +293,24 @@ export default function App() {
         <QuickActionsFab
           fabOpen={fabOpen}
           setFabOpen={setFabOpen}
+          onNewSalary={handleOpenAddSalary}
           onNewIncome={handleOpenIncome}
           onNewExpense={handleOpenExpense}
           onNewInvestment={handleOpenInvestment}
         />
 
         <Suspense fallback={null}>
+          {salaryModal.isOpen && (
+            <SalaryModal
+              isOpen={salaryModal.isOpen}
+              mode={salaryModal.mode}
+              salaryData={salaryModal.data}
+              setSalaryData={setSalaryModal}
+              onClose={handleCloseSalaryModal}
+              onSubmit={handleSaveSalary}
+            />
+          )}
+
           {modalType === 'settings' && (
             <SettingsModal
               onClose={handleCloseModal}
@@ -290,6 +339,16 @@ export default function App() {
               updateRow={updateCategoryBudgetRow}
               removeRow={removeCategoryBudgetRow}
               onSave={handleSaveCategoryBudgetsSubmit}
+              plannedBudget={formPlannedBudget}
+              totalAllocated={totalCategoryBudgetAllocated}
+              remainingToAllocate={remainingCategoryBudgetAllocate}
+              isOverBudget={isCategoryBudgetOver}
+              allocationRatio={categoryBudgetAllocationRatio}
+              allocationPercentage={categoryBudgetAllocationPercentage}
+              onOpenSettings={() => {
+                handleCloseModal();
+                handleOpenSettings('finance');
+              }}
             />
           )}
 

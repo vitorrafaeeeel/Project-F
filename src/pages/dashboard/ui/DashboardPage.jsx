@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react';
 import {
-  DollarSign, ArrowDownCircle, Wallet, ArrowDownRight, ArrowUpRight,
-  Target, PiggyBank, ShieldCheck, AlertTriangle, Plus, Sliders, CheckCircle2
+  ArrowDownRight, ArrowUpRight,
+  AlertTriangle, Plus, Sliders, CheckCircle2
 } from 'lucide-react';
 import { formatCurrency } from '../../../shared/lib/currency.js';
 import { categoryConfig } from '../../../entities/expense/model/categories.js';
@@ -38,91 +38,59 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
   return (
     <div className="space-y-6">
       {/* 1. Cards de Métricas Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Renda Total */}
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 transition-colors duration-300">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Renda Total (Mês Atual)</p>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(monthTotalIncome)}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Fixo: {formatCurrency(data?.income || 0)} | Extras: {formatCurrency(currentMonthStats.monthExtraIncome)}
-              </p>
-            </div>
-            <div className="p-3 bg-green-100 dark:bg-green-950/50 text-green-600 dark:text-green-400 rounded-full">
-              <DollarSign size={24} />
-            </div>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Saldo Atual */}
+        <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/60 transition-colors">
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Atual em Conta</p>
+          <h3 className="text-2xl font-bold mt-1.5 text-blue-600 dark:text-blue-400">
+            {formatCurrency(data?.currentAccountBalance || 0)}
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Disponibilidade financeira imediata
+          </p>
         </div>
 
         {/* Gastos Totais */}
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 transition-colors duration-300">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Gastos Totais (Mês Atual)</p>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(monthTotalExpenses)}</h3>
-              <div className="flex flex-col gap-0.5 mt-1">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Fixos: {formatCurrency(currentMonthStats.monthFixedExpenses)} | Variáveis: {formatCurrency(currentMonthStats.monthVariableExpenses)}
-                </p>
-                {projections.prevMonthStats?.totalExpenses > 0 && (
-                  <div className={`flex items-center gap-1 text-[10px] font-medium ${
-                    monthTotalExpenses > projections.prevMonthStats.totalExpenses ? 'text-red-500' : 'text-green-500'
-                  }`}>
-                    {monthTotalExpenses > projections.prevMonthStats.totalExpenses ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                    <span>{Math.abs(((monthTotalExpenses - projections.prevMonthStats.totalExpenses) / projections.prevMonthStats.totalExpenses) * 100).toFixed(1)}% vs Mês Passado</span>
-                  </div>
-                )}
+        <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/60 transition-colors">
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Gastos Totais</p>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-1.5">{formatCurrency(monthTotalExpenses)}</h3>
+          <div className="flex flex-col gap-1 mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Fixos: {formatCurrency(currentMonthStats.monthFixedExpenses)} | Variáveis: {formatCurrency(currentMonthStats.monthVariableExpenses)}
+            </p>
+            {projections.prevMonthStats?.totalExpenses > 0 && (
+              <div className={`flex items-center gap-1 text-[10px] font-medium ${
+                monthTotalExpenses > projections.prevMonthStats.totalExpenses ? 'text-red-500' : 'text-green-500'
+              }`}>
+                {monthTotalExpenses > projections.prevMonthStats.totalExpenses ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                <span>{Math.abs(((monthTotalExpenses - projections.prevMonthStats.totalExpenses) / projections.prevMonthStats.totalExpenses) * 100).toFixed(1)}% vs Mês Passado</span>
               </div>
-            </div>
-            <div className="p-3 bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400 rounded-full">
-              <ArrowDownCircle size={24} />
-            </div>
-          </div>
-        </div>
-
-        {/* Saldo Atual */}
-        <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 transition-colors duration-300">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Atual em Conta</p>
-              <h3 className="text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400">
-                {formatCurrency(data?.currentAccountBalance || 0)}
-              </h3>
-            </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-full">
-              <Wallet size={24} />
-            </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* 2. Seção de Metas, Progresso Financeiro e Orçamentos */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Coluna da Esquerda: Saúde do Orçamento e Taxa de Poupança */}
+        {/* Coluna da Esquerda: Orçamento Geral e Taxa de Poupança */}
         <div className="lg:col-span-6 space-y-6">
-          {/* Card: Indicador de Saúde de Gastos */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 transition-colors duration-300">
+          {/* Card: Orçamento Geral */}
+          <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/60 transition-colors">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-lg">
-                  <ShieldCheck size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
-                    Saúde do Orçamento
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Consumo do limite planejado para o mês
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+                  Orçamento Geral
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Consumo do limite planejado para o mês
+                </p>
               </div>
 
               {plannedBudget > 0 && (
                 <button
                   onClick={() => onOpenSettings?.('finance')}
                   className="text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer transition-colors"
-                  title="Ajustar teto de gastos"
+                  title="Ajustar Orçamento Geral"
                 >
                   <Sliders size={13} />
                   <span>Ajustar</span>
@@ -169,7 +137,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                 </div>
 
                 {/* Barra de Progresso do Orçamento Geral */}
-                <div className="w-full bg-gray-100 dark:bg-zinc-950 rounded-full h-3 overflow-hidden p-0.5 border border-gray-100 dark:border-zinc-800">
+                <div className="w-full bg-gray-100 dark:bg-zinc-900 rounded-full h-3 overflow-hidden p-0.5 border border-gray-100 dark:border-zinc-800">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       budgetRatio >= 1
@@ -184,13 +152,13 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
 
                 {/* Detalhes de Valores */}
                 <div className="grid grid-cols-2 gap-3 pt-1 text-xs">
-                  <div className="bg-gray-50 dark:bg-zinc-950/60 p-2.5 rounded-lg border border-transparent dark:border-zinc-800/50">
+                  <div className="bg-gray-50 dark:bg-zinc-900/50 p-2.5 rounded-lg border border-transparent dark:border-zinc-800/40">
                     <p className="text-gray-500 dark:text-gray-400">Gasto Atual</p>
                     <p className="font-semibold text-gray-900 dark:text-white mt-0.5">
                       {formatCurrency(monthTotalExpenses)}
                     </p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-zinc-950/60 p-2.5 rounded-lg text-right border border-transparent dark:border-zinc-800/50">
+                  <div className="bg-gray-50 dark:bg-zinc-900/50 p-2.5 rounded-lg text-right border border-transparent dark:border-zinc-800/40">
                     <p className="text-gray-500 dark:text-gray-400">
                       {remainingBudget >= 0 ? 'Disponível no Teto' : 'Valor Excedido'}
                     </p>
@@ -203,36 +171,31 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                 </div>
               </div>
             ) : (
-              <div className="p-5 rounded-xl border border-dashed border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-950/40 text-center space-y-3">
+              <div className="p-5 rounded-xl border border-dashed border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/30 text-center space-y-3">
                 <p className="text-xs text-gray-600 dark:text-gray-300">
-                  Você ainda não definiu um teto de gastos mensal para monitorar o seu progresso.
+                  Você ainda não definiu um orçamento geral mensal para monitorar o seu progresso.
                 </p>
                 <button
                   onClick={() => onOpenSettings?.('finance')}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-950/50 dark:hover:bg-blue-900/50 rounded-lg transition-colors cursor-pointer"
                 >
                   <Plus size={14} />
-                  Definir Limite de Gastos
+                  Definir Orçamento Geral
                 </button>
               </div>
             )}
           </div>
 
           {/* Card: Taxa de Poupança / Retenção */}
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 transition-colors duration-300">
+          <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/60 transition-colors">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                  <PiggyBank size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
-                    Taxa de Retenção & Poupança
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Superávit e alocação de investimentos do mês
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+                  Taxa de Retenção & Poupança
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  Superávit e alocação de investimentos do mês
+                </p>
               </div>
 
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
@@ -264,7 +227,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
 
               {/* Barra de Distribuição da Renda: Gastos vs Aportes vs Reserva Líquida */}
               <div className="space-y-1.5">
-                <div className="w-full bg-gray-100 dark:bg-zinc-950 rounded-full h-3 overflow-hidden flex">
+                <div className="w-full bg-gray-100 dark:bg-zinc-900 rounded-full h-3 overflow-hidden flex">
                   {/* Gastos */}
                   <div
                     className="bg-blue-500 dark:bg-blue-400 h-full transition-all duration-500"
@@ -325,7 +288,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
 
               {/* Grid de Detalhamento Unificado */}
               <div className="grid grid-cols-3 gap-2 pt-1 text-xs">
-                <div className="bg-gray-50 dark:bg-zinc-950/60 p-2 rounded-lg text-center border border-transparent dark:border-zinc-800/50">
+                <div className="bg-gray-50 dark:bg-zinc-900/50 p-2 rounded-lg text-center border border-transparent dark:border-zinc-800/40">
                   <p className="text-gray-500 dark:text-gray-400 text-[10px]">Economia no Mês</p>
                   <p className={`font-bold mt-0.5 text-xs ${
                     netSavings >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
@@ -334,14 +297,14 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                   </p>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-zinc-950/60 p-2 rounded-lg text-center border border-transparent dark:border-zinc-800/50">
+                <div className="bg-gray-50 dark:bg-zinc-900/50 p-2 rounded-lg text-center border border-transparent dark:border-zinc-800/40">
                   <p className="text-gray-500 dark:text-gray-400 text-[10px]">Metas de Aporte</p>
                   <p className="font-bold text-purple-600 dark:text-purple-400 mt-0.5 text-xs">
                     {formatCurrency(totalMonthlyInvestments)}
                   </p>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-zinc-950/60 p-2 rounded-lg text-center border border-transparent dark:border-zinc-800/50">
+                <div className="bg-gray-50 dark:bg-zinc-900/50 p-2 rounded-lg text-center border border-transparent dark:border-zinc-800/40">
                   <p className="text-gray-500 dark:text-gray-400 text-[10px]">Total Investido</p>
                   <p className="font-bold text-gray-900 dark:text-white mt-0.5 text-xs">
                     {formatCurrency(totalInvestmentsBalance)}
@@ -354,22 +317,17 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
 
         {/* Coluna da Direita: Orçamento por Categoria */}
         <div className="lg:col-span-6">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 transition-colors duration-300">
+          <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/60 transition-colors">
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 rounded-lg">
-                  <Target size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
-                    Orçamento por Categoria
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {categoryBudgets.length > 0
-                      ? `${categoryBudgets.length} categoria${categoryBudgets.length > 1 ? 's com teto' : ' com teto'} no mês`
-                      : 'Limites definidos por categoria'}
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+                  Orçamento por Categoria
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {categoryBudgets.length > 0
+                    ? `${categoryBudgets.length} categoria${categoryBudgets.length > 1 ? 's com teto' : ' com teto'} no mês`
+                    : 'Distribuição do teto por categoria'}
+                </p>
               </div>
 
               <button
@@ -380,15 +338,59 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
               </button>
             </div>
 
-            {categoryBudgets.length === 0 ? (
-              <div className="p-8 rounded-xl border border-dashed border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-950/40 text-center space-y-3">
-                <div className="p-3 bg-pink-100 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 rounded-full w-fit mx-auto">
-                  <Target size={22} />
+            {/* Barra de Distribuição da Verba do Orçamento Geral */}
+            {plannedBudget > 0 && categoryBudgets.length > 0 && (
+              <div className="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-zinc-900/60 border border-gray-100 dark:border-zinc-800/60 space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-500 dark:text-gray-400">
+                    Distribuído: <strong className="text-gray-900 dark:text-white">{formatCurrency(totalCategoryBudget)}</strong> de {formatCurrency(plannedBudget)}
+                  </span>
+                  <span className={`font-semibold flex items-center gap-1 ${
+                    totalCategoryBudget > plannedBudget
+                      ? 'text-red-600 dark:text-red-400'
+                      : totalCategoryBudget === plannedBudget
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-pink-600 dark:text-pink-400'
+                  }`}>
+                    {totalCategoryBudget > plannedBudget ? (
+                      <>
+                        <AlertTriangle size={12} />
+                        Excesso (+{formatCurrency(totalCategoryBudget - plannedBudget)})
+                      </>
+                    ) : totalCategoryBudget === plannedBudget ? (
+                      <>
+                        <CheckCircle2 size={12} />
+                        100% alocado
+                      </>
+                    ) : (
+                      `${((totalCategoryBudget / plannedBudget) * 100).toFixed(0)}% do teto`
+                    )}
+                  </span>
                 </div>
+
+                <div className="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      totalCategoryBudget > plannedBudget
+                        ? 'bg-red-500'
+                        : totalCategoryBudget === plannedBudget
+                          ? 'bg-emerald-500'
+                          : 'bg-pink-500'
+                    }`}
+                    style={{ width: `${Math.min((totalCategoryBudget / plannedBudget) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            {categoryBudgets.length === 0 ? (
+              <div className="p-8 rounded-xl border border-dashed border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/30 text-center space-y-3">
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Nenhum limite por categoria cadastrado</h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
-                    Defina limites específicos para alimentação, transporte, lazer e acompanhe seu consumo diário.
+                    {plannedBudget > 0
+                      ? `Distribua os ${formatCurrency(plannedBudget)} do seu Orçamento Geral entre alimentação, transporte, lazer e acompanhe seu consumo diário.`
+                      : 'Defina limites específicos para alimentação, transporte, lazer e acompanhe seu consumo diário.'}
                   </p>
                 </div>
                 <button
@@ -396,7 +398,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                   className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-pink-600 hover:bg-pink-700 rounded-lg shadow-sm transition-all cursor-pointer"
                 >
                   <Plus size={14} />
-                  Cadastrar Orçamentos
+                  {plannedBudget > 0 ? 'Distribuir Orçamento Geral' : 'Cadastrar Orçamentos'}
                 </button>
               </div>
             ) : (
@@ -406,11 +408,12 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                   const spent = categoryUsage?.[b.category] || 0;
                   const ratio = b.amount > 0 ? spent / b.amount : 0;
                   const catRemaining = b.amount - spent;
+                  const shareOfGeneral = plannedBudget > 0 ? ((b.amount / plannedBudget) * 100).toFixed(0) : null;
 
                   return (
                     <div
                       key={b.category}
-                      className="p-3 rounded-lg bg-gray-50/80 dark:bg-zinc-950/60 border border-gray-100 dark:border-zinc-800/60 transition-colors"
+                      className="p-3 rounded-lg bg-gray-50 dark:bg-zinc-900/50 border border-gray-100 dark:border-zinc-800/40 transition-colors"
                     >
                       <div className="flex justify-between items-center mb-1.5">
                         <div className="flex items-center gap-2">
@@ -418,6 +421,11 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                           <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
                             {cat.label}
                           </span>
+                          {shareOfGeneral && (
+                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-normal">
+                              ({shareOfGeneral}% do geral)
+                            </span>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -437,7 +445,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                       </div>
 
                       {/* Barra de Progresso da Categoria */}
-                      <div className="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-gray-200 dark:bg-zinc-900 rounded-full h-2 overflow-hidden">
                         <div
                           className={`h-2 rounded-full transition-all duration-500 ${
                             ratio >= 1
@@ -461,11 +469,34 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
                 })}
 
                 {totalCategoryBudget > 0 && plannedBudget > 0 && totalCategoryBudget > plannedBudget && (
-                  <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200/60 dark:border-amber-800/40 flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300">
-                    <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                  <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200/60 dark:border-red-800/40 flex items-start gap-2 text-xs text-red-800 dark:text-red-300">
+                    <AlertTriangle size={15} className="mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
                     <p>
-                      A soma dos orçamentos por categoria (<strong>{formatCurrency(totalCategoryBudget)}</strong>) ultrapassa o limite planejado de gastos mensal (<strong>{formatCurrency(plannedBudget)}</strong>).
+                      A soma dos orçamentos por categoria (<strong>{formatCurrency(totalCategoryBudget)}</strong>) ultrapassa o <strong>Orçamento Geral</strong> mensal (<strong>{formatCurrency(plannedBudget)}</strong>) em <strong>{formatCurrency(totalCategoryBudget - plannedBudget)}</strong>.
                     </p>
+                  </div>
+                )}
+
+                {totalCategoryBudget > 0 && plannedBudget > 0 && totalCategoryBudget < plannedBudget && (
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center pt-1">
+                    Você ainda possui {formatCurrency(plannedBudget - totalCategoryBudget)} do Orçamento Geral disponível para alocar.
+                  </p>
+                )}
+
+                {plannedBudget === 0 && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200/60 dark:border-amber-800/40 flex items-start justify-between gap-2 text-xs text-amber-800 dark:text-amber-300">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                      <p>Defina o <strong>Orçamento Geral</strong> para validar e integrar a distribuição das categorias.</p>
+                    </div>
+                    {onOpenSettings && (
+                      <button
+                        onClick={() => onOpenSettings?.('finance')}
+                        className="shrink-0 font-semibold underline text-amber-900 dark:text-amber-200 cursor-pointer"
+                      >
+                        Ajustar
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

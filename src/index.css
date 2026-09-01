@@ -20,10 +20,39 @@ input[type="number"] {
 }
 
 /* Ocultar barra de rolagem onde aplicável */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+.hide-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+[data-hide-scrollbar]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+.hide-scrollbar,
+.no-scrollbar,
+[data-hide-scrollbar] {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Estilização para seletores de data no modo escuro */
+html.dark input[type="date"],
+body.dark input[type="date"],
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
 }
