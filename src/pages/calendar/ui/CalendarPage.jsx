@@ -4,28 +4,29 @@ import { formatCurrency } from '../../../shared/lib/currency.js';
 
 export const CalendarPage = memo(({ calendarData, calendarOffset, setCalendarOffset, setEditExpenseModal, setEditIncomeModal }) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300 p-6">
+    <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 overflow-hidden transition-colors duration-300 p-6">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <CalendarDays className="text-blue-500" /> Calendário Financeiro
         </h3>
-        <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 p-1.5 rounded-lg border border-gray-100 dark:border-gray-700">
-          <button onClick={() => setCalendarOffset(Math.max(0, calendarOffset - 1))} disabled={calendarOffset === 0} className="p-1.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 transition-colors shadow-sm disabled:shadow-none">
+        <div className="flex items-center gap-3 bg-gray-50 dark:bg-zinc-950/60 p-1.5 rounded-lg border border-gray-100 dark:border-zinc-800">
+          <button onClick={() => setCalendarOffset(Math.max(0, calendarOffset - 1))} disabled={calendarOffset === 0} className="p-1.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-30 transition-colors shadow-sm disabled:shadow-none cursor-pointer">
             <ChevronLeft size={20} />
           </button>
           <span className="font-semibold text-sm text-gray-800 dark:text-white min-w-[130px] text-center uppercase tracking-wide">
             {calendarData.monthName} {calendarData.year}
           </span>
-          <button onClick={() => setCalendarOffset(Math.min(11, calendarOffset + 1))} disabled={calendarOffset === 11} className="p-1.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 transition-colors shadow-sm disabled:shadow-none">
+          <button onClick={() => setCalendarOffset(Math.min(11, calendarOffset + 1))} disabled={calendarOffset === 11} className="p-1.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-30 transition-colors shadow-sm disabled:shadow-none cursor-pointer">
             <ChevronRight size={20} />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-          <div key={day} className="bg-gray-50 dark:bg-gray-800 text-center py-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{day}</div>
-        ))}
+      <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
+        <div className="min-w-[520px] sm:min-w-0 grid grid-cols-7 gap-px bg-gray-200 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
+            <div key={day} className="bg-gray-50 dark:bg-zinc-950 text-center py-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{day}</div>
+          ))}
         {calendarData.grid.map((cell, idx) => {
           let dailyIncome = 0, dailyExpense = 0;
           (cell.events || []).forEach(ev => {
@@ -34,14 +35,14 @@ export const CalendarPage = memo(({ calendarData, calendarOffset, setCalendarOff
           });
           const dailyBalance = dailyIncome - dailyExpense;
           return (
-          <div key={idx} className={`bg-white dark:bg-gray-900 min-h-[100px] p-2 flex flex-col transition-colors group relative ${!cell.day ? 'bg-gray-50 dark:bg-gray-800/30' : 'hover:bg-blue-50/50 dark:hover:bg-blue-900/10'}`}>
+          <div key={idx} className={`bg-white dark:bg-zinc-900 min-h-[100px] p-2 flex flex-col transition-colors group relative ${!cell.day ? 'bg-gray-50 dark:bg-zinc-950/40' : 'hover:bg-blue-50/50 dark:hover:bg-zinc-800/40'}`}>
             {cell.day && (
               <>
-                <div className="absolute z-50 hidden group-hover:block bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded p-2 shadow-xl border border-gray-700 dark:border-gray-300">
-                   <p className="font-bold border-b border-gray-700 dark:border-gray-300 pb-1 mb-1">Resumo do Dia {cell.day}</p>
-                   <p className="text-green-400 dark:text-green-600">Entradas: +{formatCurrency(dailyIncome)}</p>
-                   <p className="text-red-400 dark:text-red-600">Saídas: -{formatCurrency(dailyExpense)}</p>
-                   <p className={`font-semibold mt-1 pt-1 border-t border-gray-700 dark:border-gray-300 ${dailyBalance >= 0 ? 'text-blue-400 dark:text-blue-600' : 'text-orange-400 dark:text-orange-600'}`}>Saldo do Dia: {formatCurrency(dailyBalance)}</p>
+                <div className="absolute z-50 hidden group-hover:block bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-gray-900 dark:bg-black text-white text-xs rounded p-2 shadow-xl border border-gray-700 dark:border-zinc-700">
+                   <p className="font-bold border-b border-gray-700 dark:border-zinc-700 pb-1 mb-1">Resumo do Dia {cell.day}</p>
+                   <p className="text-green-400 dark:text-green-400">Entradas: +{formatCurrency(dailyIncome)}</p>
+                   <p className="text-red-400 dark:text-red-400">Saídas: -{formatCurrency(dailyExpense)}</p>
+                   <p className={`font-semibold mt-1 pt-1 border-t border-gray-700 dark:border-zinc-700 ${dailyBalance >= 0 ? 'text-blue-400' : 'text-orange-400'}`}>Saldo do Dia: {formatCurrency(dailyBalance)}</p>
                 </div>
                 <div className="flex justify-between items-start mb-1">
                     <div className="flex flex-col">
@@ -52,7 +53,7 @@ export const CalendarPage = memo(({ calendarData, calendarOffset, setCalendarOff
                 </div>
                 <div className="flex flex-col gap-1 overflow-y-auto hide-scrollbar flex-1 relative z-10">
                   {cell.events.map((ev, eIdx) => (
-                    <div key={eIdx} className={`group/event text-[10px] px-1.5 py-1 rounded font-medium relative ${ev.type === 'income' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'}`}>
+                    <div key={eIdx} className={`group/event text-[10px] px-1.5 py-1 rounded font-medium relative ${ev.type === 'income' ? 'bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400'}`}>
                       <div className="truncate pr-4">
                         {ev.type === 'income' ? '+' : '-'} {formatCurrency(ev.amount).replace('R$', '').trim()}
                         <span className="block opacity-75 font-normal truncate">{ev.desc}</span>
@@ -64,7 +65,7 @@ export const CalendarPage = memo(({ calendarData, calendarOffset, setCalendarOff
                             if (ev.type === 'expense') setEditExpenseModal({ isOpen: true, data: ev.raw });
                             if (ev.type === 'income') setEditIncomeModal({ isOpen: true, data: ev.raw });
                           }}
-                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/50 hidden group-hover/event:block transition-colors"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded bg-white/50 dark:bg-black/40 hover:bg-white dark:hover:bg-black/70 hidden group-hover/event:block transition-colors"
                         ><Pencil size={10} /></button>
                       )}
                     </div>
@@ -74,6 +75,7 @@ export const CalendarPage = memo(({ calendarData, calendarOffset, setCalendarOff
             )}
           </div>
         )})}
+        </div>
       </div>
     </div>
   );

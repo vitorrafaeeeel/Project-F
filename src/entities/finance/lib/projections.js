@@ -156,8 +156,11 @@ export function computeProjections(data) {
     if (i === 0) currentMonthStats = point;
   }
 
+  const totalInvestmentsBalance = (data.investments || []).reduce((acc, curr) => acc + (curr.currentBalance || 0), 0);
+
   return {
     totalInvestmentMonthly,
+    totalInvestmentsBalance,
     currentMonthStats,
     prevMonthStats: { totalExpenses: prevFixedExpenses + prevVariableExpenses },
     dailySpending: dailyExpensesRaw.map((val, idx) => ({ day: idx + 1, amount: val })),

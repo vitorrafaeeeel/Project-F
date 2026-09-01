@@ -46,11 +46,11 @@ export function SettingsModal({
   const initialLetter = (fullName || 'U').charAt(0).toUpperCase();
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xl relative max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-xl relative max-h-[90vh] flex flex-col border border-gray-200 dark:border-zinc-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
         {/* Header do Modal */}
-        <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+        <div className="p-5 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between bg-gray-50/50 dark:bg-zinc-900/90">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-blue-600 text-white rounded-xl shadow-sm">
               <User size={20} />
@@ -63,7 +63,7 @@ export function SettingsModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-1.5 focus:outline-none cursor-pointer"
+            className="text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full p-1.5 focus:outline-none cursor-pointer"
             title="Fechar"
           >
             <X size={18} />
@@ -71,7 +71,7 @@ export function SettingsModal({
         </div>
 
         {/* Navegação de Abas do Modal */}
-        <div className="flex border-b border-gray-100 dark:border-gray-700 px-6 pt-3 bg-gray-50/30 dark:bg-gray-900/20 gap-4 text-sm font-medium">
+        <div className="flex border-b border-gray-100 dark:border-zinc-800 px-6 pt-3 bg-gray-50/30 dark:bg-zinc-950/40 gap-4 text-sm font-medium">
           <button
             type="button"
             onClick={() => setActiveSection('profile')}
@@ -114,16 +114,16 @@ export function SettingsModal({
           {activeSection === 'profile' && (
             <div className="space-y-6">
               {/* Bloco de Avatar */}
-              <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/10 dark:to-transparent rounded-2xl border border-blue-100/60 dark:border-blue-900/30">
+              <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent rounded-2xl border border-blue-100/60 dark:border-blue-950/40">
                 <div className="relative group">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}
                       alt="Avatar"
-                      className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-white dark:border-gray-700"
+                      className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-white dark:border-zinc-800"
                     />
                   ) : (
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-md border-4 border-white dark:border-gray-700">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-md border-4 border-white dark:border-zinc-800">
                       {initialLetter}
                     </div>
                   )}
@@ -132,7 +132,7 @@ export function SettingsModal({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg border-2 border-white dark:border-gray-800 transition-transform active:scale-95 group-hover:scale-105 cursor-pointer"
+                    className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg border-2 border-white dark:border-zinc-900 transition-transform active:scale-95 group-hover:scale-105 cursor-pointer"
                     title="Alterar foto de perfil"
                   >
                     <Camera size={16} />
@@ -166,7 +166,7 @@ export function SettingsModal({
                     placeholder="Seu nome completo"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
                   />
                 </div>
 
@@ -178,7 +178,7 @@ export function SettingsModal({
                     type="email"
                     disabled
                     value={email}
-                    className="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/60 text-gray-500 dark:text-gray-400 p-3 border text-sm cursor-not-allowed"
+                    className="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-950/60 text-gray-500 dark:text-gray-400 p-3 border text-sm cursor-not-allowed"
                   />
                 </div>
 
@@ -191,7 +191,7 @@ export function SettingsModal({
                     placeholder="000.000.000-00"
                     value={cpf}
                     onChange={(e) => setCpf(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
                   />
                 </div>
 
@@ -203,7 +203,7 @@ export function SettingsModal({
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
                   />
                 </div>
 
@@ -216,7 +216,7 @@ export function SettingsModal({
                     placeholder="(00) 00000-0000"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
                   />
                 </div>
               </div>
@@ -226,7 +226,7 @@ export function SettingsModal({
           {/* Seção 2: Ajustes Financeiros */}
           {activeSection === 'finance' && (
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50/60 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/40 mb-2">
+              <div className="p-4 bg-blue-50/60 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-950/50 mb-2">
                 <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed flex items-center gap-1.5">
                   <Sparkles size={14} className="flex-shrink-0" />
                   Esses valores alimentam o Dashboard e os gráficos de projeção futura.
@@ -244,7 +244,7 @@ export function SettingsModal({
                   placeholder="0.00"
                   value={editIncome}
                   onChange={(e) => setEditIncome(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Seu salário líquido ou receita recorrente mensal base.</p>
               </div>
@@ -260,7 +260,7 @@ export function SettingsModal({
                   placeholder="Ex: 5"
                   value={editIncomeDay}
                   onChange={(e) => setEditIncomeDay(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Usado apenas para mostrar o salário no Calendário — não altera o saldo automaticamente.</p>
               </div>
@@ -276,7 +276,7 @@ export function SettingsModal({
                   placeholder="0.00"
                   value={editBalance}
                   onChange={(e) => setEditBalance(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Saldo líquido disponível em suas contas correntes hoje.</p>
               </div>
@@ -292,7 +292,7 @@ export function SettingsModal({
                   placeholder="0.00"
                   value={editBudget}
                   onChange={(e) => setEditBudget(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700/80 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Teto de gastos desejado para o mês atual.</p>
               </div>
@@ -315,10 +315,10 @@ export function SettingsModal({
                     className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-3 transition-all text-center cursor-pointer ${
                       !isDarkMode
                         ? 'border-blue-600 bg-blue-50/50 text-blue-700 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'
+                        : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <div className={`p-3 rounded-full ${!isDarkMode ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                    <div className={`p-3 rounded-full ${!isDarkMode ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300'}`}>
                       <Sun size={24} />
                     </div>
                     <div>
@@ -338,16 +338,16 @@ export function SettingsModal({
                     onClick={() => setIsDarkMode(true)}
                     className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-3 transition-all text-center cursor-pointer ${
                       isDarkMode
-                        ? 'border-blue-500 bg-blue-900/20 text-blue-400 shadow-sm'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'
+                        ? 'border-blue-500 bg-blue-950/40 text-blue-400 shadow-sm'
+                        : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <div className={`p-3 rounded-full ${isDarkMode ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                    <div className={`p-3 rounded-full ${isDarkMode ? 'bg-blue-500 text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300'}`}>
                       <Moon size={24} />
                     </div>
                     <div>
                       <p className="font-bold text-sm">Modo Escuro</p>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Confortável para pouca luz</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Preto absoluto confortável</p>
                     </div>
                     {isDarkMode && (
                       <div className="flex items-center gap-1 text-xs font-semibold text-blue-400">
@@ -363,11 +363,11 @@ export function SettingsModal({
         </div>
 
         {/* Footer com Botões de Ação */}
-        <div className="p-5 border-t border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/80 flex items-center justify-end gap-3">
+        <div className="p-5 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/90 flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+            className="px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Cancelar
           </button>

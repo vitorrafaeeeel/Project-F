@@ -2,6 +2,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html.dark, body.dark {
+  background-color: #000000;
+  color: #f3f4f6;
+}
+
 /* Remove spinners de inputs numéricos */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
