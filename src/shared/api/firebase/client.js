@@ -5,13 +5,13 @@ import { getFirestore } from 'firebase/firestore';
 import { firebaseApiKey } from '../../config/env.js';
 
 const firebaseConfig = {
-  apiKey: firebaseApiKey || import.meta.env.VITE_FIREBASE_API_KEY || 'SUA_CHAVE_FIREBASE_AQUI',
-  authDomain: 'project-f-77ed8.firebaseapp.com',
-  projectId: 'project-f-77ed8',
-  storageBucket: 'project-f-77ed8.firebasestorage.app',
-  messagingSenderId: '261138589545',
-  appId: '1:261138589545:web:e6eb19add3bfe6eb8c7ff8',
-  measurementId: 'G-ETLN1M012M'
+  apiKey: firebaseApiKey || "AIzaSyCnwLv4djcrm-qgA0Hw7cJtSpy6aU5TCAE",
+  authDomain: "project-f-77ed8.firebaseapp.com",
+  projectId: "project-f-77ed8",
+  storageBucket: "project-f-77ed8.appspot.com",
+  messagingSenderId: "261138589545",
+  appId: "1:261138589545:web:c04130007812cf691fa68c",
+  measurementId: "G-ETLN1M012M"
 };
 
 
