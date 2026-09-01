@@ -1,6 +1,14 @@
-import { Plus, ArrowUpCircle, Receipt, PiggyBank, Briefcase } from 'lucide-react';
+import { Plus, ArrowUpCircle, Receipt, PiggyBank, Briefcase, Target } from 'lucide-react';
 
-export function QuickActionsFab({ fabOpen, setFabOpen, onNewSalary, onNewIncome, onNewExpense, onNewInvestment }) {
+export function QuickActionsFab({
+  fabOpen,
+  setFabOpen,
+  onNewSalary,
+  onNewIncome,
+  onNewExpense,
+  onNewInvestment,
+  onNewGoal
+}) {
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
       {fabOpen && (
@@ -31,6 +39,14 @@ export function QuickActionsFab({ fabOpen, setFabOpen, onNewSalary, onNewIncome,
           >
             Novo Investimento <PiggyBank size={17} />
           </button>
+          {onNewGoal && (
+            <button
+              onClick={() => { onNewGoal(); setFabOpen(false); }}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-full shadow-lg hover:bg-indigo-700 transition-colors font-medium text-sm cursor-pointer"
+            >
+              Nova Meta / Objetivo <Target size={17} />
+            </button>
+          )}
         </div>
       )}
       <button

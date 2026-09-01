@@ -8,5 +8,6 @@ export const DEFAULT_DATA = {
   extraIncomes: [],
   expenses: [],
   investments: [],
-  categoryBudgets: []
+  categoryBudgets: [],
+  goals: []
 };

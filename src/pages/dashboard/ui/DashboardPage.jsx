@@ -5,8 +5,17 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../../../shared/lib/currency.js';
 import { categoryConfig } from '../../../entities/expense/model/categories.js';
+import { DashboardGoalCard } from '../../../features/manage-goal/ui/DashboardGoalCard.jsx';
 
-export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCategoryBudgets, onOpenSettings }) => {
+export const DashboardPage = memo(({
+  projections,
+  data,
+  categoryUsage,
+  onOpenCategoryBudgets,
+  onOpenSettings,
+  onOpenNewGoal,
+  onOpenGoalsTab
+}) => {
   const currentMonthStats = projections?.currentMonthStats;
 
   const plannedBudget = data?.plannedBudget || 0;
@@ -14,6 +23,8 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
   const totalCategoryBudget = useMemo(() => categoryBudgets.reduce((acc, b) => acc + (b.amount || 0), 0), [categoryBudgets]);
 
   const investments = useMemo(() => data?.investments || [], [data?.investments]);
+  const goals = useMemo(() => data?.goals || [], [data?.goals]);
+
   const totalInvestmentsBalance = useMemo(
     () => projections?.totalInvestmentsBalance ?? investments.reduce((acc, inv) => acc + (inv.currentBalance || 0), 0),
     [projections?.totalInvestmentsBalance, investments]
@@ -32,6 +43,24 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
   const budgetRatio = plannedBudget > 0 ? (monthTotalExpenses / plannedBudget) : 0;
   const budgetPct = (budgetRatio * 100).toFixed(1);
   const remainingBudget = plannedBudget - monthTotalExpenses;
+
+  const averageInterestRate = useMemo(() => {
+    if (investments.length === 0) return 0.008;
+    const totalBal = investments.reduce((acc, i) => acc + (i.currentBalance || 0), 0);
+    if (totalBal > 0) {
+      return investments.reduce((acc, i) => acc + ((i.currentBalance || 0) * (i.interestRate || 0.008)), 0) / totalBal;
+    }
+    return investments.reduce((acc, i) => acc + (i.interestRate || 0.008), 0) / investments.length;
+  }, [investments]);
+
+  const financialStats = useMemo(() => ({
+    monthTotalIncome,
+    monthTotalExpenses,
+    netSavings,
+    totalInvestmentsBalance,
+    totalInvestmentMonthly: totalMonthlyInvestments,
+    averageInterestRate
+  }), [monthTotalIncome, monthTotalExpenses, netSavings, totalInvestmentsBalance, totalMonthlyInvestments, averageInterestRate]);
 
   if (!currentMonthStats) return null;
 
@@ -315,8 +344,17 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
           </div>
         </div>
 
-        {/* Coluna da Direita: Orçamento por Categoria */}
-        <div className="lg:col-span-6">
+        {/* Coluna da Direita: Meta Principal e Orçamento por Categoria */}
+        <div className="lg:col-span-6 space-y-6">
+          {/* Card: Meta & Objetivo Principal */}
+          <DashboardGoalCard
+            goals={goals}
+            financialStats={financialStats}
+            onOpenNewGoal={onOpenNewGoal}
+            onOpenGoalsTab={onOpenGoalsTab}
+          />
+
+          {/* Card: Orçamento por Categoria */}
           <div className="bg-white dark:bg-zinc-950 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800/60 transition-colors">
             <div className="flex justify-between items-center mb-4">
               <div>
