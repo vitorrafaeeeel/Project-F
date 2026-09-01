@@ -89,7 +89,11 @@ export default function App() {
   }, [resetMessages]);
 
   // --- HANDLERS MEMOIZADOS PARA EVITAR RE-RENDERS ---
-  const handleOpenSettings = useCallback(() => setModalType('settings'), []);
+  const [settingsSection, setSettingsSection] = useState('profile');
+  const handleOpenSettings = useCallback((section = 'profile') => {
+    setSettingsSection(section);
+    setModalType('settings');
+  }, []);
   const handleCloseModal = useCallback(() => setModalType(null), []);
   const handleOpenIncome = useCallback(() => setModalType('income'), []);
   const handleOpenExpense = useCallback(() => setModalType('expense'), []);
@@ -113,8 +117,19 @@ export default function App() {
   } = useInvestmentActions(data, updateData);
 
   const {
-    editIncome, setEditIncome, editIncomeDay, setEditIncomeDay, editBalance, setEditBalance, editBudget, setEditBudget, handleUpdateAccount
-  } = useAccountSettingsForm(data, updateData);
+    editIncome, setEditIncome,
+    editIncomeDay, setEditIncomeDay,
+    editBalance, setEditBalance,
+    editBudget, setEditBudget,
+    fullName, setFullName,
+    email,
+    cpf, setCpf,
+    birthDate, setBirthDate,
+    phone, setPhone,
+    avatarUrl, setAvatarUrl,
+    isSaving,
+    handleUpdateAccount
+  } = useAccountSettingsForm(data, updateData, user, profile);
 
   const {
     rows: categoryBudgetRows, addRow: addCategoryBudgetRow, updateRow: updateCategoryBudgetRow,
@@ -223,8 +238,8 @@ export default function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           firstName={firstName}
-          isDarkMode={isDarkMode}
-          setIsDarkMode={setIsDarkMode}
+          profile={profile}
+          user={user}
           onOpenSettings={handleOpenSettings}
           onLogout={handleLogout}
         />
@@ -250,10 +265,19 @@ export default function App() {
           {modalType === 'settings' && (
             <SettingsModal
               onClose={handleCloseModal}
+              initialSection={settingsSection}
               editIncome={editIncome} setEditIncome={setEditIncome}
               editIncomeDay={editIncomeDay} setEditIncomeDay={setEditIncomeDay}
               editBalance={editBalance} setEditBalance={setEditBalance}
               editBudget={editBudget} setEditBudget={setEditBudget}
+              fullName={fullName} setFullName={setFullName}
+              email={email}
+              cpf={cpf} setCpf={setCpf}
+              birthDate={birthDate} setBirthDate={setBirthDate}
+              phone={phone} setPhone={setPhone}
+              avatarUrl={avatarUrl} setAvatarUrl={setAvatarUrl}
+              isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode}
+              isSaving={isSaving}
               onSave={handleSaveSettings}
             />
           )}

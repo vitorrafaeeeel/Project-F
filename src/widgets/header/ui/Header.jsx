@@ -1,52 +1,229 @@
-import { memo } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import {
-  TrendingUp, LayoutDashboard, Receipt, CalendarDays, PiggyBank,
-  Sun, Moon, Settings, LogOut
+  LayoutDashboard, Receipt, CalendarDays, PiggyBank,
+  User, SlidersHorizontal, Settings, LogOut, ChevronDown
 } from 'lucide-react';
 
-export const Header = memo(({ activeTab, setActiveTab, firstName, isDarkMode, setIsDarkMode, onOpenSettings, onLogout }) => {
+export const Header = memo(({
+  activeTab,
+  setActiveTab,
+  firstName,
+  profile,
+  user,
+  onOpenSettings,
+  onLogout
+}) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Fecha o dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
+  const displayName = profile?.fullName || user?.displayName || firstName || 'Usuário';
+  const userEmail = profile?.email || user?.email || '';
+
   return (
-    <header className="bg-white dark:bg-gray-800 shadow relative z-10 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-600 rounded-lg text-white">
-            <TrendingUp size={24} />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Finanças Plus</h1>
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700/80 sticky top-0 z-30 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+
+        {/* 1. LADO ESQUERDO: Iniciais FS limpas, sem fundo, card ou borda */}
+        <div className="flex items-center shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveTab('dashboard')}
+            className="text-xl sm:text-2xl font-black tracking-wider text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer select-none focus:outline-none"
+            title="Finanças Simplificadas"
+          >
+            FS
+          </button>
         </div>
 
-        <div className="flex items-center gap-4 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-          <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg flex-nowrap transition-colors duration-300 min-w-max">
-            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${activeTab === 'dashboard' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}>
-              <LayoutDashboard size={18} /> <span className="hidden sm:inline">Resumo</span>
+        {/* 2. CENTRO: Links de Navegação Centralizados e Flutuantes (sem caixas cinzas) */}
+        <div className="flex-1 flex justify-center overflow-x-auto hide-scrollbar">
+          <nav className="flex items-center gap-1 sm:gap-6">
+            <button
+              type="button"
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
+                activeTab === 'dashboard'
+                  ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <LayoutDashboard size={17} />
+              <span>Resumo</span>
+              {activeTab === 'dashboard' && (
+                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
+              )}
             </button>
-            <button onClick={() => setActiveTab('expenses')} className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${activeTab === 'expenses' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}>
-              <Receipt size={18} /> <span className="hidden sm:inline">Transações</span>
-            </button>
-            <button onClick={() => setActiveTab('calendar')} className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${activeTab === 'calendar' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}>
-              <CalendarDays size={18} /> <span className="hidden sm:inline">Calendário</span>
-            </button>
-            <button onClick={() => setActiveTab('investments')} className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${activeTab === 'investments' ? 'bg-white dark:bg-gray-600 shadow text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}>
-              <PiggyBank size={18} /> <span className="hidden sm:inline">Investimentos</span>
-            </button>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <div className="hidden lg:block text-right">
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 max-w-[180px] truncate">Ola, {firstName}</p>
-            </div>
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" title="Alternar Tema">
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            <button
+              type="button"
+              onClick={() => setActiveTab('expenses')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
+                activeTab === 'expenses'
+                  ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <Receipt size={17} />
+              <span>Transações</span>
+              {activeTab === 'expenses' && (
+                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
+              )}
             </button>
-            <button onClick={onOpenSettings} className="p-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" title="Configurações">
-              <Settings size={20} />
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('calendar')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
+                activeTab === 'calendar'
+                  ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <CalendarDays size={17} />
+              <span>Calendário</span>
+              {activeTab === 'calendar' && (
+                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
+              )}
             </button>
-            <button onClick={onLogout} className="p-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-300 transition-colors" title="Sair">
-              <LogOut size={20} />
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('investments')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors relative cursor-pointer whitespace-nowrap ${
+                activeTab === 'investments'
+                  ? 'text-blue-600 dark:text-blue-400 font-semibold'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <PiggyBank size={17} />
+              <span>Investimentos</span>
+              {activeTab === 'investments' && (
+                <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
+              )}
             </button>
+          </nav>
+        </div>
+
+        {/* 3. LADO DIREITO: Bloco do Usuário isolado na extremidade direita com dropdown */}
+        <div className="flex items-center justify-end shrink-0">
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(prev => !prev)}
+              className="flex items-center gap-2 py-1.5 px-2.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/60 transition-colors focus:outline-none cursor-pointer select-none"
+              aria-haspopup="true"
+              aria-expanded={dropdownOpen}
+              title="Menu do Usuário"
+            >
+              {profile?.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt={displayName}
+                  className="w-8 h-8 rounded-full object-cover shadow-sm border border-gray-200 dark:border-gray-600"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
+
+              <span className="text-sm font-semibold max-w-[120px] truncate hidden sm:inline">
+                Olá, {firstName || displayName}
+              </span>
+              <ChevronDown
+                size={15}
+                className={`text-gray-500 dark:text-gray-400 transition-transform duration-200 ${
+                  dropdownOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Menu Flutuante */}
+            {dropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                {/* Header com Identificação do Usuário */}
+                <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-700/80">
+                  <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Conectado como</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white truncate mt-0.5">{displayName}</p>
+                  {userEmail && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>}
+                </div>
+
+                {/* Opções do Menu */}
+                <div className="py-1 px-1 space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      onOpenSettings('profile');
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                  >
+                    <User size={16} className="text-gray-500 dark:text-gray-400" />
+                    <span>Editar Perfil</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      onOpenSettings('finance');
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                  >
+                    <SlidersHorizontal size={16} className="text-gray-500 dark:text-gray-400" />
+                    <span>Editar Informações</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      onOpenSettings('appearance');
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                  >
+                    <Settings size={16} className="text-gray-500 dark:text-gray-400" />
+                    <span>Configurações Gerais</span>
+                  </button>
+                </div>
+
+                {/* Sair */}
+                <div className="border-t border-gray-100 dark:border-gray-700/80 pt-1 px-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      onLogout();
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center gap-2.5 transition-colors font-semibold cursor-pointer"
+                  >
+                    <LogOut size={16} />
+                    <span>Sair</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
       </div>
     </header>
   );
 });
+

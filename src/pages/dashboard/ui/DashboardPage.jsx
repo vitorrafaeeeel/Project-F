@@ -9,7 +9,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
   const maxChartValue = useMemo(() => {
     if (!projections?.timeline || projections.timeline.length === 0) return 100;
     const maxVal = Math.max(...projections.timeline.map(t => Math.max(t.netBalance || 0, t.totalInvestments || 0, 0)));
-    return maxVal > 0 ? maxVal : 100;
+    return maxVal > 0 ? Math.ceil(maxVal * 1.1) : 100;
   }, [projections?.timeline]);
 
   const budgetGuidance = useMemo(() => {
@@ -178,7 +178,7 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"><Target size={18} className="text-pink-500" /> Orçamento por Categoria</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Limites definidos por categoria (mês atual).</p>
           </div>
-          <button onClick={onOpenCategoryBudgets} className="text-sm font-medium text-pink-600 hover:text-pink-700 dark:text-pink-400 whitespace-nowrap">Editar</button>
+          <button onClick={onOpenCategoryBudgets} className="text-sm font-medium text-pink-600 hover:text-pink-700 dark:text-pink-400 whitespace-nowrap cursor-pointer">Editar</button>
         </div>
         {categoryBudgets.length === 0 ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum orçamento por categoria definido ainda.</p>
@@ -210,67 +210,135 @@ export const DashboardPage = memo(({ projections, data, categoryUsage, onOpenCat
       {/* Evolutivo Chart & Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
         <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <TrendingUp size={20} className="text-blue-500" /> Evolução Projetada (12 Meses)
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">A projeção assume que nos meses futuros você atingirá o seu Planejamento de Gastos.</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            A projeção calcula a evolução do seu patrimônio com base na sua receita fixa, investimentos e no teto de gastos mensal.
+          </p>
         </div>
-        <div className="p-6 overflow-x-auto">
-          <div className="min-w-[600px] h-64 flex items-end gap-2 pb-6 relative">
-            <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-xs text-gray-400 pr-2 border-r border-gray-200 dark:border-gray-700 w-16 text-right">
-              <span>{formatCurrency(maxChartValue).split(',')[0]}</span>
-              <span>{formatCurrency(maxChartValue / 2).split(',')[0]}</span>
+
+        {/* Gráfico 100% Responsivo sem barra de rolagem */}
+        <div className="p-5 sm:p-6">
+          <div className="w-full h-64 sm:h-72 flex flex-col justify-end relative select-none">
+            
+            {/* Linhas de Grade de Fundo */}
+            <div className="absolute left-16 right-0 top-0 bottom-8 flex flex-col justify-between pointer-events-none z-0">
+              <div className="w-full border-t border-dashed border-gray-200 dark:border-gray-700/60"></div>
+              <div className="w-full border-t border-dashed border-gray-200 dark:border-gray-700/60"></div>
+              <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+
+            {/* Eixo Y */}
+            <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-[11px] font-medium text-gray-500 dark:text-gray-400 w-14 text-right pr-2 select-none z-10">
+              <span className="truncate">{formatCurrency(maxChartValue).split(',')[0]}</span>
+              <span className="truncate">{formatCurrency(maxChartValue / 2).split(',')[0]}</span>
               <span>R$ 0</span>
             </div>
-            <div className="ml-16 flex-1 flex items-end justify-between h-full relative">
-              <div className="absolute w-full h-px bg-gray-200 dark:bg-gray-700 bottom-0"></div>
+
+            {/* Área das Colunas do Gráfico */}
+            <div className="ml-16 flex-1 flex items-end justify-between h-full pb-8 relative z-10">
               {projections.timeline.map((point, idx) => {
-                const balanceHeight = Math.max(0, (point.netBalance / maxChartValue) * 100);
-                const investHeight = Math.max(0, (point.totalInvestments / maxChartValue) * 100);
+                const balanceHeight = Math.min(Math.max(0, (point.netBalance / maxChartValue) * 100), 100);
+                const investHeight = Math.min(Math.max(0, (point.totalInvestments / maxChartValue) * 100), 100);
+
                 return (
-                  <div key={idx} className="flex flex-col items-center flex-1 group">
-                    <div className="flex gap-1 items-end h-[200px] w-full justify-center relative">
-                      <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded p-2 z-10 whitespace-nowrap pointer-events-none shadow-lg">
-                        <p className="font-bold mb-1">{point.label}</p>
-                        <p>Conta: {formatCurrency(point.netBalance)}</p>
-                        <p>Patrimônio: {formatCurrency(point.totalInvestments)}</p>
+                  <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative px-0.5 sm:px-1">
+                    
+                    {/* Tooltip Flutuante Moderno e de Alto Contraste */}
+                    <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-150 bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-sm text-white text-xs rounded-xl p-3 z-40 whitespace-nowrap pointer-events-none shadow-2xl border border-gray-700/80 min-w-[180px]">
+                      <div className="flex items-center justify-between border-b border-gray-700/60 pb-1.5 mb-2">
+                        <span className="font-bold text-gray-100">{point.label}</span>
+                        {idx === 0 && (
+                          <span className="text-[10px] bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded font-semibold">
+                            Atual
+                          </span>
+                        )}
                       </div>
-                      <div className={`w-1/3 max-w-[20px] rounded-t-sm transition-all duration-500 ${point.netBalance >= 0 ? 'bg-blue-400 dark:bg-blue-500' : 'bg-red-400 dark:bg-red-500'}`} style={{ height: `${balanceHeight}%` }}></div>
-                      <div className="w-1/3 max-w-[20px] bg-green-400 dark:bg-green-500 rounded-t-sm transition-all duration-500" style={{ height: `${investHeight}%` }}></div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-3 text-gray-300">
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                            Saldo em Conta:
+                          </span>
+                          <span className="font-semibold text-white">{formatCurrency(point.netBalance)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 text-gray-300">
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            Investimentos:
+                          </span>
+                          <span className="font-semibold text-white">{formatCurrency(point.totalInvestments)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-gray-700/50 text-gray-400">
+                          <span>Patrimônio Total:</span>
+                          <span className="font-bold text-emerald-400">{formatCurrency(point.netBalance + point.totalInvestments)}</span>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-2">{point.label}</span>
+
+                    {/* Barras Lado a Lado */}
+                    <div className="w-full flex items-end justify-center gap-1 h-full">
+                      {/* Barra de Saldo em Conta */}
+                      <div
+                        className={`flex-1 max-w-[14px] rounded-t-sm transition-all duration-300 group-hover:brightness-110 ${
+                          point.netBalance >= 0 ? 'bg-blue-500 dark:bg-blue-400' : 'bg-red-400 dark:bg-red-500'
+                        }`}
+                        style={{ height: `${balanceHeight}%` }}
+                      ></div>
+                      {/* Barra de Patrimônio / Investimentos */}
+                      <div
+                        className="flex-1 max-w-[14px] bg-emerald-500 dark:bg-emerald-400 rounded-t-sm transition-all duration-300 group-hover:brightness-110"
+                        style={{ height: `${investHeight}%` }}
+                      ></div>
+                    </div>
+
+                    {/* Rótulo do Eixo X (Mês) */}
+                    <span className="absolute top-full mt-1.5 text-[10px] sm:text-[11px] font-medium text-gray-500 dark:text-gray-400 truncate max-w-full text-center">
+                      {point.label.split('/')[0]}
+                    </span>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="flex justify-center gap-6 mt-2 text-sm text-gray-600 dark:text-gray-300">
-            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-400 dark:bg-blue-500 rounded-sm"></div><span>Saldo na Conta (Parado)</span></div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-green-400 dark:bg-green-500 rounded-sm"></div><span>Patrimônio (Investimentos)</span></div>
+
+          {/* Legenda do Gráfico */}
+          <div className="flex flex-wrap justify-center gap-6 mt-6 pt-3 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-gray-700/60">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-sm"></div>
+              <span>Saldo na Conta (Parado)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-sm"></div>
+              <span>Patrimônio (Investimentos)</span>
+            </div>
           </div>
         </div>
+
+        {/* Tabela de Projeções */}
         <div className="overflow-x-auto border-t border-gray-100 dark:border-gray-700">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800">
+            <thead className="text-xs text-gray-500 dark:text-gray-400 uppercase bg-gray-50 dark:bg-gray-800/80">
               <tr>
-                <th className="px-6 py-3">Mês</th>
-                <th className="px-6 py-3 text-right">Fluxo do Mês (Conta)</th>
-                <th className="px-6 py-3 text-right">Saldo na Conta (Parado)</th>
-                <th className="px-6 py-3 text-right">Patrimônio Total (Investimentos)</th>
+                <th className="px-6 py-3.5 font-semibold">Mês</th>
+                <th className="px-6 py-3.5 text-right font-semibold">Fluxo do Mês (Conta)</th>
+                <th className="px-6 py-3.5 text-right font-semibold">Saldo na Conta (Parado)</th>
+                <th className="px-6 py-3.5 text-right font-semibold">Patrimônio Total</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {projections.timeline.map((point, idx) => (
-                <tr key={idx} className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                <tr key={idx} className="bg-white dark:bg-gray-800 hover:bg-gray-50/80 dark:hover:bg-gray-700/40 transition-colors">
+                  <td className="px-6 py-3.5 font-medium text-gray-900 dark:text-white">
                     {point.label}
-                    {idx === 0 && <span className="ml-2 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900/30 dark:text-blue-300">Atual</span>}
+                    {idx === 0 && <span className="ml-2 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full dark:bg-blue-900/40 dark:text-blue-300 font-semibold">Atual</span>}
                   </td>
-                  <td className={`px-6 py-4 text-right font-medium ${point.appliedMonthlyBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                  <td className={`px-6 py-3.5 text-right font-semibold ${point.appliedMonthlyBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
                     {idx === 0 ? '-' : formatCurrency(point.appliedMonthlyBalance)}
                   </td>
-                  <td className="px-6 py-4 text-right text-gray-700 dark:text-gray-300">{formatCurrency(point.netBalance)}</td>
-                  <td className="px-6 py-4 text-right font-bold text-green-600 dark:text-green-400">{formatCurrency(point.totalAssets)}</td>
+                  <td className="px-6 py-3.5 text-right text-gray-700 dark:text-gray-300">{formatCurrency(point.netBalance)}</td>
+                  <td className="px-6 py-3.5 text-right font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(point.netBalance + point.totalInvestments)}</td>
                 </tr>
               ))}
             </tbody>
