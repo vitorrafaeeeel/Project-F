@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { parseCurrencyInput } from '../../../shared/lib/currency.js';
+import { parseCurrencyInput, maskCurrency } from '../../../shared/lib/currency.js';
 import { saveProfile } from '../../../entities/user/model/api.js';
 
 export function useAccountSettingsForm(data, updateData, user, profile) {
@@ -22,10 +22,10 @@ export function useAccountSettingsForm(data, updateData, user, profile) {
   const [trackedData, setTrackedData] = useState(data);
   if (data && data !== trackedData) {
     setTrackedData(data);
-    setEditIncome(data.income?.toString() || '0');
+    setEditIncome(maskCurrency(data.income) || '0,00');
     setEditIncomeDay(data.incomePaymentDay?.toString() || '');
-    setEditBalance((data.currentAccountBalance || 0).toString());
-    setEditBudget((data.plannedBudget || 0).toString());
+    setEditBalance(maskCurrency(data.currentAccountBalance) || '0,00');
+    setEditBudget(maskCurrency(data.plannedBudget) || '0,00');
   }
 
   // Sincroniza campos de perfil durante render

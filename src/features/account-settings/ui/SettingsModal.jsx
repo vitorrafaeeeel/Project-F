@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import {
-  X, User, Camera, Sun, Moon, Mail,
-  Calendar, Phone, DollarSign, Wallet, PiggyBank,
-  Check, Save, Sparkles, CreditCard
+  X, User, Camera, Sun, Moon,
+  Check, Save, Sparkles
 } from 'lucide-react';
+import { CustomDatePicker } from '../../../shared/ui/CustomDatePicker.jsx';
+import { CurrencyInput } from '../../../shared/ui/CurrencyInput.jsx';
 
 export function SettingsModal({
   onClose,
@@ -46,13 +47,13 @@ export function SettingsModal({
   const initialLetter = (fullName || 'U').charAt(0).toUpperCase();
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-xl relative max-h-[90vh] flex flex-col border border-gray-200 dark:border-zinc-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain hide-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl w-full max-w-xl relative my-auto max-h-[90vh] flex flex-col border border-gray-100 dark:border-zinc-800/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200 overscroll-contain">
 
         {/* Header do Modal */}
-        <div className="p-5 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between bg-gray-50/50 dark:bg-zinc-900/90">
+        <div className="p-5 border-b border-gray-100 dark:border-zinc-800/60 flex items-center justify-between bg-gray-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-blue-600 text-white rounded-xl shadow-sm">
+            <div className="p-2 bg-blue-600 text-white rounded-lg shadow-sm">
               <User size={20} />
             </div>
             <div>
@@ -71,7 +72,7 @@ export function SettingsModal({
         </div>
 
         {/* Navegação de Abas do Modal */}
-        <div className="flex border-b border-gray-100 dark:border-zinc-800 px-6 pt-3 bg-gray-50/30 dark:bg-zinc-950/40 gap-4 text-sm font-medium">
+        <div className="flex border-b border-gray-100 dark:border-zinc-800/60 px-6 pt-3 bg-gray-50/30 dark:bg-zinc-900/30 gap-4 text-sm font-medium">
           <button
             type="button"
             onClick={() => setActiveSection('profile')}
@@ -107,12 +108,12 @@ export function SettingsModal({
           </button>
         </div>
 
-        {/* Conteúdo com Scroll */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        {/* Conteúdo com Scroll Oculto */}
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 overscroll-contain hide-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
           {/* Seção 1: Dados Pessoais e Avatar */}
           {activeSection === 'profile' && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Bloco de Avatar */}
               <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent rounded-2xl border border-blue-100/60 dark:border-blue-950/40">
                 <div className="relative group">
@@ -120,10 +121,10 @@ export function SettingsModal({
                     <img
                       src={avatarUrl}
                       alt="Avatar"
-                      className="w-24 h-24 rounded-full object-cover shadow-md border-4 border-white dark:border-zinc-800"
+                      className="w-20 h-20 rounded-full object-cover shadow-md border-4 border-white dark:border-zinc-800"
                     />
                   ) : (
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-3xl font-bold shadow-md border-4 border-white dark:border-zinc-800">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl font-bold shadow-md border-4 border-white dark:border-zinc-800">
                       {initialLetter}
                     </div>
                   )}
@@ -132,10 +133,10 @@ export function SettingsModal({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg border-2 border-white dark:border-zinc-900 transition-transform active:scale-95 group-hover:scale-105 cursor-pointer"
+                    className="absolute bottom-0 right-0 p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg border-2 border-white dark:border-zinc-900 transition-transform active:scale-95 group-hover:scale-105 cursor-pointer"
                     title="Alterar foto de perfil"
                   >
-                    <Camera size={16} />
+                    <Camera size={14} />
                   </button>
 
                   <input
@@ -147,8 +148,8 @@ export function SettingsModal({
                   />
                 </div>
 
-                <div className="text-center mt-3">
-                  <h4 className="text-base font-bold text-gray-900 dark:text-white">
+                <div className="text-center mt-2.5">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                     {fullName || 'Seu Nome'}
                   </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{email || 'email@exemplo.com'}</p>
@@ -156,67 +157,66 @@ export function SettingsModal({
               </div>
 
               {/* Formulário de Perfil */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <User size={14} className="text-blue-500" /> Nome Completo
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Nome Completo
                   </label>
                   <input
                     type="text"
                     placeholder="Seu nome completo"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-900 dark:text-white p-2.5 border text-sm bg-white"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <Mail size={14} className="text-blue-500" /> E-mail (Identificador)
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    E-mail
                   </label>
                   <input
                     type="email"
                     disabled
                     value={email}
-                    className="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-950/60 text-gray-500 dark:text-gray-400 p-3 border text-sm cursor-not-allowed"
+                    className="w-full rounded-xl border-gray-200 dark:border-zinc-800 bg-gray-100 dark:bg-zinc-900/60 text-gray-500 dark:text-gray-400 p-2.5 border text-sm cursor-not-allowed"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <CreditCard size={14} className="text-blue-500" /> CPF
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    CPF
                   </label>
                   <input
                     type="text"
                     placeholder="000.000.000-00"
                     value={cpf}
                     onChange={(e) => setCpf(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-900 dark:text-white p-2.5 border text-sm bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <Calendar size={14} className="text-blue-500" /> Data de Nascimento
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Data de Nascimento
                   </label>
-                  <input
-                    type="date"
+                  <CustomDatePicker
                     value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
+                    onChange={(val) => setBirthDate(val)}
+                    buttonClassName="p-2.5 text-sm rounded-xl"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <Phone size={14} className="text-blue-500" /> Telefone / WhatsApp
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Telefone / WhatsApp
                   </label>
                   <input
                     type="tel"
                     placeholder="(00) 00000-0000"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm"
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-900 dark:text-white p-2.5 border text-sm bg-white"
                   />
                 </div>
               </div>
@@ -226,75 +226,68 @@ export function SettingsModal({
           {/* Seção 2: Ajustes Financeiros */}
           {activeSection === 'finance' && (
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50/60 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-950/50 mb-2">
+              <div className="p-3.5 bg-blue-50/60 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-950/50">
                 <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed flex items-center gap-1.5">
-                  <Sparkles size={14} className="flex-shrink-0" />
-                  Esses valores alimentam o Dashboard e os gráficos de projeção futura.
+                  <Sparkles size={14} className="flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                  Esses valores alimentam o Dashboard e as projeções financeiras do sistema.
                 </p>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <DollarSign size={14} className="text-green-500" /> Renda Mensal Fixa (R$)
-                </label>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={editIncome}
-                  onChange={(e) => setEditIncome(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Seu salário líquido ou receita recorrente mensal base.</p>
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Renda Mensal Fixa
+                  </label>
+                  <CurrencyInput
+                    value={editIncome}
+                    onChange={(val) => setEditIncome(val)}
+                    focusRingColor="focus:border-blue-500 focus:ring-blue-500"
+                    className="py-2.5 text-sm"
+                  />
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Salário líquido mensal base.</p>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <Calendar size={14} className="text-blue-500" /> Dia do Recebimento do Salário
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="31"
-                  placeholder="Ex: 5"
-                  value={editIncomeDay}
-                  onChange={(e) => setEditIncomeDay(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Usado apenas para mostrar o salário no Calendário — não altera o saldo automaticamente.</p>
-              </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Dia do Recebimento
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="31"
+                    placeholder="Ex: 5"
+                    value={editIncomeDay}
+                    onChange={(e) => setEditIncomeDay(e.target.value)}
+                    className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-zinc-900 dark:text-white p-2.5 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Destaque de entrada no Calendário.</p>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <Wallet size={14} className="text-blue-500" /> Saldo Atual em Conta (R$)
-                </label>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={editBalance}
-                  onChange={(e) => setEditBalance(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Saldo líquido disponível em suas contas correntes hoje.</p>
-              </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Saldo Atual em Conta
+                  </label>
+                  <CurrencyInput
+                    value={editBalance}
+                    onChange={(val) => setEditBalance(val)}
+                    focusRingColor="focus:border-blue-500 focus:ring-blue-500"
+                    className="py-2.5 text-sm"
+                  />
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Saldo líquido disponível em contas hoje.</p>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <PiggyBank size={14} className="text-purple-500" /> Limite Planejado de Gastos/Mês (R$)
-                </label>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={editBudget}
-                  onChange={(e) => setEditBudget(e.target.value)}
-                  className="w-full rounded-xl border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Teto de gastos desejado para o mês atual.</p>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Orçamento Geral (Teto no Mês)
+                  </label>
+                  <CurrencyInput
+                    value={editBudget}
+                    onChange={(val) => setEditBudget(val)}
+                    focusRingColor="focus:border-blue-500 focus:ring-blue-500"
+                    className="py-2.5 text-sm"
+                  />
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Teto total planejado de gastos para o mês.</p>
+                </div>
               </div>
 
             </div>

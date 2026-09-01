@@ -1,5 +1,6 @@
 import { memo, useState } from 'react';
 import { TrendingUp, Moon, Sun, Mail, Lock } from 'lucide-react';
+import { CustomDatePicker } from '../../../shared/ui/CustomDatePicker.jsx';
 
 export const AuthPage = memo(({ isDarkMode, setIsDarkMode, onSubmit, onPasswordReset, authLoading, authError, authSuccess }) => {
   const [mode, setMode] = useState('login');
@@ -56,7 +57,11 @@ export const AuthPage = memo(({ isDarkMode, setIsDarkMode, onSubmit, onPasswordR
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data de nascimento</label>
-                    <input type="date" required value={birthDate} onChange={(event) => setBirthDate(event.target.value)} className="w-full rounded-md border-gray-300 dark:border-zinc-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-zinc-950 dark:text-white p-3 border bg-white" />
+                    <CustomDatePicker
+                      value={birthDate}
+                      onChange={(val) => setBirthDate(val)}
+                      buttonClassName="p-3"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CPF</label>

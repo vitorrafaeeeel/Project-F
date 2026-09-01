@@ -1,8 +1,8 @@
-export function computeCalendarData(data, projections, calendarOffset) {
-  if (!data || !projections) return { grid: [], monthName: '', year: '' };
+export function computeCalendarData(data, projections, calendarOffset = 0) {
+  if (!data || !projections) return { grid: [], monthName: '', year: '', targetMonth: 0, targetYear: 0 };
   const monthsNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   const targetMonthRaw = projections.currentMonth + calendarOffset;
-  const targetMonth = targetMonthRaw % 12;
+  const targetMonth = ((targetMonthRaw % 12) + 12) % 12;
   const targetYear = projections.currentYear + Math.floor(targetMonthRaw / 12);
   const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
   const firstDayOfWeek = new Date(targetYear, targetMonth, 1).getDay();
@@ -10,7 +10,18 @@ export function computeCalendarData(data, projections, calendarOffset) {
   const eventsByDay = {};
   const addEvent = (d, ev) => { const sd = Math.min(d, daysInMonth); if (!eventsByDay[sd]) eventsByDay[sd] = []; eventsByDay[sd].push(ev); };
 
-  if (data.incomePaymentDay && data.income) {
+  if (data.salaries && Array.isArray(data.salaries) && data.salaries.length > 0) {
+    data.salaries.forEach(sal => {
+      if (sal.paymentDay && sal.amount > 0) {
+        addEvent(sal.paymentDay, {
+          type: 'income',
+          desc: sal.name || 'Salário',
+          amount: sal.amount,
+          synthetic: true
+        });
+      }
+    });
+  } else if (data.incomePaymentDay && data.income) {
     addEvent(data.incomePaymentDay, { type: 'income', desc: 'Salário', amount: data.income, synthetic: true });
   }
 
@@ -35,5 +46,5 @@ export function computeCalendarData(data, projections, calendarOffset) {
   for (let i = 0; i < firstDayOfWeek; i++) grid.push({ day: null, events: [] });
   for (let day = 1; day <= daysInMonth; day++) grid.push({ day, events: eventsByDay[day] || [] });
 
-  return { grid, monthName: monthsNames[targetMonth], year: targetYear };
+  return { grid, monthName: monthsNames[targetMonth], year: targetYear, targetMonth, targetYear };
 }

@@ -82,7 +82,11 @@ export function computeProjections(data) {
         monthExtraIncome += inc.amount;
       }
     });
-    const monthTotalIncome = (data.income || 0) + monthExtraIncome;
+
+    const totalFixedSalary = (data.salaries && Array.isArray(data.salaries) && data.salaries.length > 0)
+      ? data.salaries.reduce((sum, s) => sum + (s.amount || 0), 0)
+      : (data.income || 0);
+    const monthTotalIncome = totalFixedSalary + monthExtraIncome;
 
     let monthFixedExpenses = 0;
     let monthVariableExpenses = 0;

@@ -60,7 +60,7 @@ export const Header = memo(({
   ];
 
   return (
-    <header className="bg-white dark:bg-black border-b border-gray-100 dark:border-zinc-800 sticky top-0 z-30 transition-colors duration-300">
+    <header className="bg-white dark:bg-black border-b border-gray-100 dark:border-zinc-800/60 sticky top-0 z-30 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
 
         {/* 1. LADO ESQUERDO: Avatar Circular do Usuário ("V") tanto no Desktop quanto no Mobile */}
@@ -81,7 +81,7 @@ export const Header = memo(({
                 <img
                   src={profile.avatarUrl}
                   alt={displayName}
-                  className="w-9 h-9 rounded-full object-cover shadow-sm border border-gray-200 dark:border-zinc-700"
+                  className="w-9 h-9 rounded-full object-cover shadow-sm border border-gray-200 dark:border-zinc-800"
                 />
               ) : (
                 <div className="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-sm font-bold shadow-sm transition-colors">
@@ -92,9 +92,9 @@ export const Header = memo(({
 
             {/* Dropdown Menu Flutuante (alinhado à esquerda) */}
             {dropdownOpen && (
-              <div className="absolute left-0 top-full mt-2 w-56 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-gray-200 dark:border-zinc-800 py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute left-0 top-full mt-2 w-56 bg-white dark:bg-zinc-950 rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800/60 py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                 {/* Header com Identificação do Usuário */}
-                <div className="px-4 py-2.5 border-b border-gray-100 dark:border-zinc-800">
+                <div className="px-4 py-2.5 border-b border-gray-100 dark:border-zinc-800/60">
                   <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Conectado como</p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white truncate mt-0.5">{displayName}</p>
                   {userEmail && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userEmail}</p>}
@@ -108,7 +108,7 @@ export const Header = memo(({
                       setDropdownOpen(false);
                       onOpenSettings('profile');
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-900/60 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
                   >
                     <User size={16} className="text-gray-500 dark:text-gray-400" />
                     <span>Perfil</span>
@@ -120,7 +120,7 @@ export const Header = memo(({
                       setDropdownOpen(false);
                       onOpenSettings('finance');
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-900/60 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
                   >
                     <SlidersHorizontal size={16} className="text-gray-500 dark:text-gray-400" />
                     <span>Informações</span>
@@ -132,7 +132,7 @@ export const Header = memo(({
                       setDropdownOpen(false);
                       onOpenSettings('appearance');
                     }}
-                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-900/60 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
                   >
                     <Settings size={16} className="text-gray-500 dark:text-gray-400" />
                     <span>Tema Claro/Escuro</span>
@@ -140,7 +140,7 @@ export const Header = memo(({
                 </div>
 
                 {/* Sair */}
-                <div className="border-t border-gray-100 dark:border-zinc-800 pt-1 px-1">
+                <div className="border-t border-gray-100 dark:border-zinc-800/60 pt-1 px-1">
                   <button
                     type="button"
                     onClick={() => {
@@ -195,7 +195,7 @@ export const Header = memo(({
                 setMobileMenuOpen(prev => !prev);
                 setDropdownOpen(false);
               }}
-              className="p-2 -mr-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors focus:outline-none cursor-pointer"
+              className="p-2 -mr-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors focus:outline-none cursor-pointer"
               aria-label="Abrir menu de navegação"
               aria-expanded={mobileMenuOpen}
             >
@@ -213,7 +213,7 @@ export const Header = memo(({
       {mobileMenuOpen && (
         <div
           ref={mobileDrawerRef}
-          className="md:hidden border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-black px-4 py-3 space-y-1 animate-in fade-in slide-in-from-top-1 duration-150"
+          className="md:hidden border-t border-gray-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-950 px-4 py-3 space-y-1 animate-in fade-in slide-in-from-top-1 duration-150"
         >
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -223,10 +223,10 @@ export const Header = memo(({
                 key={item.id}
                 type="button"
                 onClick={() => handleTabSelect(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                   isActive
                     ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-900/60'
                 }`}
               >
                 <Icon size={18} className={isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'} />
