@@ -11,15 +11,15 @@ export function useInvestmentActions(data, updateData) {
   const handleAddInvestment = useCallback((e, closeModal) => {
     e.preventDefault();
     const monthlyAmount = parseCurrencyInput(newInvestment.monthlyAmount);
-    const currentBalance = parseCurrencyInput(newInvestment.currentBalance);
-    const interestRate = parseCurrencyInput(newInvestment.interestRate);
-    if (!newInvestment.desc || isNaN(monthlyAmount) || monthlyAmount < 0) return;
+    const rawBalance = parseCurrencyInput(newInvestment.currentBalance);
+    const rawRate = parseCurrencyInput(newInvestment.interestRate);
+    if (!newInvestment.desc || !newInvestment.desc.trim()) return;
     const investment = {
       id: crypto.randomUUID(),
       desc: newInvestment.desc.trim(),
-      monthlyAmount,
-      currentBalance,
-      interestRate: interestRate / 100
+      monthlyAmount: isNaN(monthlyAmount) || monthlyAmount < 0 ? 0 : monthlyAmount,
+      currentBalance: isNaN(rawBalance) || rawBalance < 0 ? 0 : rawBalance,
+      interestRate: isNaN(rawRate) || rawRate < 0 ? 0.008 : rawRate / 100
     };
     updateData?.({ investments: [...(data?.investments || []), investment] });
     setNewInvestment(emptyNewInvestment());
@@ -40,11 +40,16 @@ export function useInvestmentActions(data, updateData) {
   const handleUpdateInvestment = useCallback((e) => {
     e.preventDefault();
     const amount = parseCurrencyInput(editInvModal.monthlyAmount);
-    const rate = parseCurrencyInput(editInvModal.interestRate);
-    if (!editInvModal.desc || isNaN(amount) || amount < 0) return;
+    const rawRate = parseCurrencyInput(editInvModal.interestRate);
+    if (!editInvModal.desc || !editInvModal.desc.trim()) return;
     const updatedInvestments = (data?.investments || []).map(inv =>
       inv.id === editInvModal.id
-        ? { ...inv, desc: editInvModal.desc.trim(), monthlyAmount: amount, interestRate: isNaN(rate) ? inv.interestRate : rate / 100 }
+        ? {
+            ...inv,
+            desc: editInvModal.desc.trim(),
+            monthlyAmount: isNaN(amount) || amount < 0 ? 0 : amount,
+            interestRate: isNaN(rawRate) || rawRate < 0 ? inv.interestRate : rawRate / 100
+          }
         : inv
     );
     updateData?.({ investments: updatedInvestments });

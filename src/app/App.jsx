@@ -184,8 +184,8 @@ export default function App() {
   // --- RENDER ---
   if (startupError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-6">
-        <div className="w-full max-w-lg rounded-xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-gray-800 p-6 shadow-sm">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black text-gray-800 dark:text-gray-200 p-6">
+        <div className="w-full max-w-lg rounded-xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-zinc-900 p-6 shadow-sm">
           <h1 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Não foi possível iniciar o app</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
             {startupError}
@@ -200,7 +200,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black text-gray-800 dark:text-gray-200">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -208,7 +208,7 @@ export default function App() {
 
   if (!user) {
     return (
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
         <AuthPage
           isDarkMode={isDarkMode}
           setIsDarkMode={setIsDarkMode}
@@ -224,7 +224,7 @@ export default function App() {
 
   if (!data || !projections) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black text-gray-800 dark:text-gray-200">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -232,7 +232,7 @@ export default function App() {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans relative pb-20 transition-colors duration-300">
+      <div className="min-h-screen bg-gray-100 dark:bg-black text-gray-900 dark:text-gray-100 font-sans relative pb-20 transition-colors duration-300">
 
         <Header
           activeTab={activeTab}
@@ -246,10 +246,10 @@ export default function App() {
 
         <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <Suspense fallback={<PageLoadingFallback />}>
-            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} />}
+            {activeTab === 'dashboard' && <DashboardPage projections={projections} data={data} categoryUsage={categoryUsage} onOpenCategoryBudgets={handleOpenCategoryBudgets} onOpenSettings={handleOpenSettings} />}
             {activeTab === 'calendar' && <CalendarPage calendarData={calendarData} calendarOffset={calendarOffset} setCalendarOffset={setCalendarOffset} setEditExpenseModal={setEditExpenseModal} setEditIncomeModal={setEditIncomeModal} />}
             {activeTab === 'expenses' && <ExpensesPage data={data} expenseFilter={expenseFilter} setExpenseFilter={setExpenseFilter} filteredImpact={filteredImpact} filteredExpenses={filteredExpenses} setEditIncomeModal={setEditIncomeModal} handleDeleteExtraIncome={handleDeleteExtraIncome} setEditExpenseModal={setEditExpenseModal} handleDeleteExpense={handleDeleteExpense} />}
-            {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}
+            {activeTab === 'investments' && <InvestmentsPage data={data} projections={projections} onNewInvestment={handleOpenInvestment} setEditInvModal={setEditInvModal} setDepositModal={setDepositModal} handleDeleteInvestment={handleDeleteInvestment} />}
           </Suspense>
         </main>
 
